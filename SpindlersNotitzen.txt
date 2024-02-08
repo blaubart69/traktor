@@ -1,0 +1,10 @@
+CMakeLists.txt at "root dir" builds traktor AND unittests.
+
+
+    cd ./traktor/build
+    cmake ..
+
+build and run unit tests:
+
+within dir: .../traktor/build
+make -j`nproc` &&  ctest  --test-dir test/

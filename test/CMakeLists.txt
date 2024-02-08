@@ -1,8 +1,12 @@
-
-
 set(EXE_TEST traktor_test)
 project(${EXE_TEST} LANGUAGES CXX)
-add_executable(${EXE_TEST} traktor_test.cpp)
+
+set(SOURCES 
+    traktor_test.cpp
+    ../traktor/src/calculate.cpp
+)
+
+add_executable(${EXE_TEST} ${SOURCES})
 
 target_include_directories(${EXE_TEST} PRIVATE "../deps/cpp-httplib")
 target_include_directories(${EXE_TEST} PRIVATE "../traktor/src")
@@ -18,7 +22,7 @@ option(INSTALL_GTEST OFF)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        release-1.11.0
+  GIT_TAG        v1.14.0
 )
 FetchContent_MakeAvailable(googletest)
 
@@ -36,5 +40,6 @@ target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
 target_link_libraries(${EXE_TEST} PUBLIC GTest::GTest)
 
-#enable_testing()
-#add_test(NAME ${EXECUTABLE} COMMAND traktor_test)
+enable_testing()
+include(GoogleTest)
+gtest_discover_tests(traktor_test)
