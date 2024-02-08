@@ -41,26 +41,7 @@ int project_x_inbetween_first_row(const int x_baseline, const unsigned int refli
     return x;
 }
 
-int calc_delta_to_nearest_line(int x_first_row, const unsigned int refline_distance)
-{
-    int half_refline = refline_distance / 2;
-
-    int delta_pixel;
-    if ( std::abs(x_first_row) < half_refline )
-    {
-        delta_pixel = x_first_row;
-    }
-    else if ( x_first_row > 0 )
-    {
-        delta_pixel = refline_distance - x_first_row;
-    }
-    else 
-    {
-        delta_pixel = x_first_row + refline_distance;
-    }
-}
-
-int calc_delta_to_nearest_lineV2(int x, const unsigned int refline_distance)
+int delta_from_nearest_refline(int x, const unsigned int refline_distance)
 {
     int half_refline = refline_distance / 2;
 
