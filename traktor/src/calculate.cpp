@@ -11,7 +11,12 @@ CoordPoint project_screen_point_to_coord(const int x_point_screen, const int y_p
     p.y = y_flucht + y_point_screen;
     return p;
 }
-
+//
+//  Fluchtpunkt: y=0
+//  baseline:    line on the lower end of the screen
+//  y_baseline:  vertical distance from Fluchtpunkt to lower end of the screen.
+//               screen height + y_fluchtpunkt
+//
 float project_x_onto_baseline(const CoordPoint point, const int y_baseline) 
 {
     if ( point.x == 0 ) 
@@ -19,6 +24,16 @@ float project_x_onto_baseline(const CoordPoint point, const int y_baseline)
         // point is on the middle line
         // projected to the baseline: x = 0
         return 0;
+    }
+    else if ( point.y == 0) 
+    {
+        // point is on the same y as the Fluchtpunkt
+        // projecting to the baseline is not possible.
+        // Hoff ma's...
+        // ToDo: wos is mit point.y < 0???
+        //   ein Punkt hinter dem Fluchtpunkt.
+        //   Kaun NIE sei...
+        return std::numeric_limits<float>::infinity();
     }
     else
     {
@@ -36,8 +51,17 @@ int apply_offset(int x, int offset)
 
 int project_x_inbetween_first_row(const int x_baseline, const unsigned int refline_distance) 
 {
-    int x = x_baseline % refline_distance;
-    return x;
+    if ( refline_distance == 0)
+    {
+        // 2024-02-10 Spindler
+        // don't know if this makes sense.
+        // refline_distance == 0 means there are no reflines?
+        return x_baseline;
+    }
+    else
+    {
+        return x_baseline % refline_distance;
+    }
 }
 
 int delta_from_nearest_refline(const int x, const unsigned int refline_distance)
