@@ -10,7 +10,7 @@ struct CoordPoint {
 //
 // 0,0 ... fluchtpunkt
 //
-CoordPoint project_screen_point_to_coord(const int x_point_screen, const int y_point_screen, const int x_half, const int y_flucht) 
+static CoordPoint project_screen_point_to_coord(const int x_point_screen, const int y_point_screen, const int x_half, const int y_flucht) 
 {
     CoordPoint p;
     p.x = x_point_screen - x_half;
@@ -23,7 +23,7 @@ CoordPoint project_screen_point_to_coord(const int x_point_screen, const int y_p
 //  y_baseline:  vertical distance from Fluchtpunkt to lower end of the screen.
 //               screen height + y_fluchtpunkt
 //
-bool project_x_onto_baseline(const CoordPoint point, const int y_baseline, int *x_base_line) 
+static bool project_x_onto_baseline(const CoordPoint point, const int y_baseline, int *x_base_line) 
 {
     if ( point.x == 0 ) 
     {
@@ -50,18 +50,18 @@ bool project_x_onto_baseline(const CoordPoint point, const int y_baseline, int *
     return true;
 }
 
-int apply_offset(int x, int offset)
+static int apply_offset(int x, int offset)
 {
     int x_offset =  x - offset;
     return x_offset;
 }
 
-bool is_within_range(int x, const unsigned int range_baseline)
+static bool is_within_range(int x, const unsigned int range_baseline)
 {
     return std::abs(x) < range_baseline;
 }
 
-int project_x_inbetween_first_row(const int x_baseline, const unsigned int refline_distance) 
+static int project_x_inbetween_first_row(const int x_baseline, const unsigned int refline_distance) 
 {
     if ( refline_distance == 0)
     {
@@ -76,14 +76,14 @@ int project_x_inbetween_first_row(const int x_baseline, const unsigned int refli
     }
 }
 
-int distance_to_nearest_refline_on_baseline(const int x_first_row, const unsigned int refline_distance, const unsigned int half_refline_distance)
+static int distance_to_nearest_refline_on_baseline(const int x_first_row, const unsigned int refline_distance, const unsigned int half_refline_distance)
 {
     if ( x_first_row >=  half_refline_distance ) return x_first_row - refline_distance;
     if ( x_first_row <= -half_refline_distance ) return x_first_row + refline_distance;
     return x_first_row;
 }
 
-int calc_delta_from_nearest_refline(const int x_screen, const int y_screen, int *delta_pixels)
+bool calc_delta_from_nearest_refline(const int x_screen, const int y_screen, int *delta_pixels)
 {
     const int row_count = 1;
     const int x_half = 640 / 2;
@@ -96,7 +96,7 @@ int calc_delta_from_nearest_refline(const int x_screen, const int y_screen, int 
     const unsigned int range_baseline = ( refline_distance * row_count ) + half_refline_distance;
 
     CoordPoint p;
-    p = project_screen_point_to_coord(340,100, x_half, y_flucht);
+    p = project_screen_point_to_coord(x_screen,y_screen, x_half, y_flucht);
 
     int x_baseline;
     if ( ! project_x_onto_baseline(p, y_baseline, &x_baseline ) ) 
