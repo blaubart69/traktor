@@ -68,7 +68,6 @@ struct ReflinesSettings {
         int         x_half;
         int         y_fluchtpunkt;
         int         offset;
-        
 
         int get_half_row_count() const {
             if ( rowMax == 0) {

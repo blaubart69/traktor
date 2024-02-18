@@ -27,6 +27,13 @@ TEST(CoordTest, Test_point_on_left_half)
     ASSERT_EQ( coord.y, y_flucht + 0);
 }
 
+int test_project_x_onto_baseline(CoordPoint p, int y_baseline)
+{
+    int x_baseline;
+    EXPECT_TRUE( project_x_onto_baseline(p, y_baseline, &x_baseline) );
+    return x_baseline;
+}
+
 TEST(ProjectOntoBaseline, Test1)
 {
     CoordPoint coord;
@@ -34,9 +41,8 @@ TEST(ProjectOntoBaseline, Test1)
     coord.y = 4;
 
     const int y_baseline = 10; // screensize + y_flucht
-    float x_baseline = project_x_onto_baseline(coord, y_baseline);
-
-    EXPECT_FLOAT_EQ( x_baseline, 2.5);
+    
+    EXPECT_EQ( test_project_x_onto_baseline(coord,y_baseline), 2 );
 }
 
 TEST(ProjectOntoBaseline, Test2)
@@ -46,9 +52,7 @@ TEST(ProjectOntoBaseline, Test2)
     coord.y = 4;
 
     const int y_baseline = 10; // screensize + y_flucht
-    float x_baseline = project_x_onto_baseline(coord, y_baseline);
-
-    EXPECT_FLOAT_EQ( x_baseline, 5);
+    EXPECT_EQ( test_project_x_onto_baseline(coord,y_baseline), 5 );
 }
 
 TEST(ProjectOntoBaseline, Test_point_on_the_baseline_right)
@@ -63,9 +67,8 @@ TEST(ProjectOntoBaseline, Test_point_on_the_baseline_right)
     ASSERT_EQ( coord.y, 480);
     
     const int y_baseline = y_screen + y_flucht; // screensize + y_flucht
-    float x_baseline = project_x_onto_baseline(coord, y_baseline);
 
-    EXPECT_FLOAT_EQ( x_baseline, 160);
+    EXPECT_EQ( test_project_x_onto_baseline(coord,y_baseline), 160 );
 }
 
 TEST(ProjectOntoBaseline, Test_point_on_the_baseline_left)
@@ -80,9 +83,9 @@ TEST(ProjectOntoBaseline, Test_point_on_the_baseline_left)
     ASSERT_EQ( coord.y, 480);
     
     const int y_baseline = y_screen + y_flucht; // screensize + y_flucht
-    float x_baseline = project_x_onto_baseline(coord, y_baseline);
 
-    EXPECT_FLOAT_EQ( x_baseline, -160);
+    //EXPECT_FLOAT_EQ( x_baseline, -160);
+    EXPECT_EQ( test_project_x_onto_baseline(coord,y_baseline), -160 );
 }
 
 TEST(ProjectOntoBaseline, Test_point_1)
@@ -97,9 +100,7 @@ TEST(ProjectOntoBaseline, Test_point_1)
     ASSERT_EQ( coord.y, 240);
     
     const int y_baseline = y_screen + y_flucht; // screensize + y_flucht
-    float x_baseline = project_x_onto_baseline(coord, y_baseline);
-
-    EXPECT_FLOAT_EQ( x_baseline, -160);
+    EXPECT_EQ( test_project_x_onto_baseline(coord,y_baseline), -160 );
 }
 
 TEST(ProjectOntoBaseline, Test_point_on_middle_line)
@@ -114,9 +115,7 @@ TEST(ProjectOntoBaseline, Test_point_on_middle_line)
     ASSERT_EQ( coord.y, 240);
     
     const int y_baseline = y_screen + y_flucht; // screensize + y_flucht
-    float x_baseline = project_x_onto_baseline(coord, y_baseline);
-
-    EXPECT_FLOAT_EQ( x_baseline, 0);
+    EXPECT_EQ( test_project_x_onto_baseline(coord,y_baseline), 0 );
 }
 
 TEST(ProjectOntoBaseline, Test_point_on_y_middle_x_10)
@@ -131,9 +130,8 @@ TEST(ProjectOntoBaseline, Test_point_on_y_middle_x_10)
     ASSERT_EQ( coord.y, 240);
     
     const int y_baseline = y_screen + y_flucht; // screensize + y_flucht
-    float x_baseline = project_x_onto_baseline(coord, y_baseline);
 
-    EXPECT_FLOAT_EQ( x_baseline, 20);
+    EXPECT_EQ( test_project_x_onto_baseline(coord,y_baseline), 20 );
 }
 
 TEST(TestNegativMod, Test_1)
