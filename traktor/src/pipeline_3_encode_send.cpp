@@ -145,7 +145,7 @@ static void draw_status_bar(cv::Mat& frame, const DetectResult& detect_result, c
     }
     else if ( detect_result.state == DETECT_STATE::SUCCESS )
     {
-        draw_threshold_bar(detect_result.is_in_threshold, detect_result.avg_threshold, x_half, status_bar.get());
+        draw_threshold_bar(detect_result.is_in_threshold, detect_result.avg_delta_px, x_half, status_bar.get());
     }
 
     frame.push_back(*status_bar);

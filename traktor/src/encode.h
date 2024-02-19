@@ -5,8 +5,8 @@
 
 struct EncodeContext
 {
-    Shared* shared;
     EncodeCounter* stats;
+    Shared* shared;
     std::unique_ptr<cv::Mat> status_bar = nullptr;
     std::vector<uchar> jpeg_buffer;
     std::function<bool(std::vector<uchar>&, uint64_t* bytes_sent)> sendJPEGbytes;

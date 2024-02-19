@@ -1,7 +1,7 @@
 #include <cmath>
 
-#include "calculate.h"
 #include "detect.h"
+#include "calculate.h"
 
 #define PRIVATE static
 
@@ -93,7 +93,7 @@ PRIVATE int apply_offset(int x, int offset)
 
 PRIVATE bool is_within_range(int x, const unsigned int range_baseline)
 {
-    return std::abs(x) < range_baseline;
+    return (unsigned int)std::abs(x) < range_baseline;
 }
 
 PRIVATE int project_x_inbetween_first_row(const int x_baseline, const unsigned int refline_distance) 
@@ -111,7 +111,7 @@ PRIVATE int project_x_inbetween_first_row(const int x_baseline, const unsigned i
     }
 }
 
-PRIVATE int distance_to_nearest_refline_on_baseline(const int x_first_row, const unsigned int refline_distance, const unsigned int half_refline_distance)
+PRIVATE int distance_to_nearest_refline_on_baseline(const int x_first_row, const int refline_distance, const int half_refline_distance)
 {
     if ( x_first_row >=  half_refline_distance ) return x_first_row - refline_distance;
     if ( x_first_row <= -half_refline_distance ) return x_first_row + refline_distance;
@@ -157,7 +157,7 @@ bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_row
     int  sum_deltaPx = 0;
     uint plants_processed = 0;
 
-    for ( int i=0; i < contoures->centers.size(); ++i )
+    for ( std::size_t i=0; i < contoures->centers.size(); ++i )
     {
         Center& plant = contoures->centers[i];
         // hier bitte mit Magie befüllen!

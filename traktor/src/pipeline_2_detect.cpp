@@ -2,6 +2,7 @@
 
 #include "detect.h"
 #include "pipeline/ImagePipeline.hpp"
+#include "calculate.h"
 
 void init_status_bar(int frame_columns, int frame_type, std::unique_ptr<cv::Mat>& status_bar)
 {
@@ -74,7 +75,7 @@ void calc_center_of_contour(const std::vector<cv::Point2i>& points, cv::Point* c
 
 void calc_centers_of_contours(Contoures* found, const int minimalContourArea)
 {
-    for ( int i=0; i < found->all_contours.size(); ++i )
+    for ( std::size_t i=0; i < found->all_contours.size(); ++i )
     {
         const auto& contour = found->all_contours[i];
         if ( cv::contourArea(contour) > minimalContourArea )
@@ -85,9 +86,9 @@ void calc_centers_of_contours(Contoures* found, const int minimalContourArea)
             cv::Point2i centerPoint;
             calc_center_of_contour(contour, &centerPoint);
             //found->centers.emplace_back( centerPoint.x, centerPoint.y );
-            found->centers.emplace_back(i, centerPoint.x, centerPoint.y);
+            found->centers.emplace_back((int)i, centerPoint.x, centerPoint.y);
             //
-            // remeber index of found center to access the corresponding contour afterwards
+            // remember index of found center to access the corresponding contour afterwards
             //
             //found->centers_contours_idx.push_back(i);
         }
@@ -99,6 +100,8 @@ void calc_centers_of_contours(Contoures* found, const int minimalContourArea)
  * x = y / ( 10 / 2 )
  * Wolfram Alpha: plot [y = (-x+2) * (10/2), {x,-2,2}]
  */
+
+/*
 bool find_point_on_nearest_refline(
       const cv::Point&        plant
     , const ReflinesSettings& settings
@@ -234,6 +237,7 @@ bool calc_overall_threshold_draw_plants(const ReflinesSettings& refSettings, con
     return centers_processed > 0;
 }
 
+
 bool is_within_threshold(const float avg_threshold, const int rowSpacingPx, const int rowThresholdPx)
 {
     const int x_overall_threshold_px = (float)avg_threshold * (float)rowSpacingPx;
@@ -241,6 +245,8 @@ bool is_within_threshold(const float avg_threshold, const int rowSpacingPx, cons
 
     return is_within_threshold;
 }
+*/
+
 
 HARROW_DIRECTION get_harrow_direction(const bool is_within_threshold, const float avg_threshold)
 {
@@ -269,7 +275,6 @@ void detect_main(Workitem* work, DetectContext* ctx)
         return;
     }
 
-
     auto start = std::chrono::high_resolution_clock::now();
 
     find_contours(
@@ -289,11 +294,17 @@ void detect_main(Workitem* work, DetectContext* ctx)
     {
         work->detect_result.state = DETECT_STATE::NOTHING_FOUND;
     }
+    /*
     else if ( ! calc_overall_threshold_draw_plants(
                     ctx->shared->detectSettings.getReflineSettings()
                     , work->frame.rows
                     , &(work->detect_result.contoures)
                     , &(work->detect_result.avg_threshold) ) )
+    {
+        work->detect_result.state = DETECT_STATE::NO_PLANTS_WITHIN_LINES;
+    }
+    */
+    else if ( ! calc_average_delta(refline_settings, work->frame.rows, &(work->detect_result.contoures), &(work->detect_result.avg_delta_px) ) )
     {
         work->detect_result.state = DETECT_STATE::NO_PLANTS_WITHIN_LINES;
     }
@@ -306,11 +317,11 @@ void detect_main(Workitem* work, DetectContext* ctx)
         else
         {
             work->detect_result.state           = DETECT_STATE::SUCCESS;
-            work->detect_result.is_in_threshold = is_within_threshold(work->detect_result.avg_threshold, refline_settings.rowSpacingPx, refline_settings.rowThresholdPx);
+            work->detect_result.is_in_threshold = std::abs(work->detect_result.avg_delta_px) <= refline_settings.rowThresholdPx;
             
             if ( ctx->harrow != nullptr )
             {
-                HARROW_DIRECTION direction = get_harrow_direction(work->detect_result.is_in_threshold, work->detect_result.avg_threshold);
+                HARROW_DIRECTION direction = get_harrow_direction(work->detect_result.is_in_threshold, work->detect_result.avg_delta_px);
                 ctx->harrow->move(direction, "detect");
             }
         }

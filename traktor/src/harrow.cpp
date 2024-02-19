@@ -82,7 +82,7 @@ void line_set_value(struct gpiod_line *line, const int value, const char* linena
     }
 }
 
-void Harrow::move(HARROW_DIRECTION direction, const char* source)
+void Harrow::move(HARROW_DIRECTION direction, __attribute__((unused))  const char* source)
 {
     //static HARROW_DIRECTION direction_last = (HARROW_DIRECTION)99;
 

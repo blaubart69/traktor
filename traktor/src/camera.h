@@ -13,16 +13,16 @@ class CameraContext
     Shared*             shared;
     std::unique_ptr<cv::VideoCapture> capture;
 
-    int                 errorCount = 0;
+    int                 errorCount;
     int delay_for_realtime_video_millis;
 
     CameraContext(CameraCounter* stats, const Options* options, Shared* shared)
     : stats(stats)
     , options(options)
     , shared(shared)
-    , delay_for_realtime_video_millis(0)
+    , capture(nullptr)    
     , errorCount(0)
-    , capture(nullptr)
+    , delay_for_realtime_video_millis(0)
     {}
 };
 

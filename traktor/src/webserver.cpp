@@ -26,7 +26,7 @@ WORKER_RC encode_main(Workitem* work, EncodeContext* ctx);
 
 void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, EncodeCounter* encode_stats)
 {
-    svr->Get("/video", [=](const Request &req, Response &res) {
+    svr->Get("/video", [=](__attribute__((unused)) const Request &req, Response &res) {
 
         static const std::string boundary("--Ba4oTvQMY8ew04N8dcnM\r\nContent-Type: image/jpeg\r\n\r\n");
         static const std::string CRLF("\r\n");
@@ -34,7 +34,7 @@ void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, En
 
         res.set_content_provider(
             "multipart/x-mixed-replace;boundary=Ba4oTvQMY8ew04N8dcnM", // Content type
-            [&](size_t offset, DataSink &sink) {
+            [&](__attribute__((unused)) size_t offset, DataSink &sink) {
 
                 int thread_count_before_add = thread_count_video.fetch_add(1);
                 if ( thread_count_before_add > 0)
@@ -75,7 +75,7 @@ void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, En
 
                 return false; // return 'false' if you want to cancel the process.
             },
-            [](bool success) {}
+            [](__attribute__((unused)) bool success) {}
         );
     });
 
@@ -128,7 +128,7 @@ void URL_applyChanges(httplib::Server* svr, DetectSettings* detect_settings)
 
 void URL_current(httplib::Server* svr, DetectSettings* settings)
 {
-    svr->Get("/current", [=](const Request &req, Response &res) {
+    svr->Get("/current", [=](__attribute__((unused)) const Request &req, Response &res) {
 
         nlohmann::json data;
         {
@@ -154,7 +154,7 @@ void URL_current(httplib::Server* svr, DetectSettings* settings)
 
 void URL_stats(httplib::Server* svr, const Stats* diff)
 {
-    svr->Get("/stats", [=](const Request &req, Response &res) {
+    svr->Get("/stats", [=](__attribute__((unused)) const Request &req, Response &res) {
 
         using namespace std::chrono;
 
@@ -211,7 +211,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCo
     //
     // ------------------------------------------------------------------------
     //
-    svr.Get("/list",       [&](const Request &req, Response &res) {
+    svr.Get("/list",       [&](__attribute__((unused)) const Request &req, Response &res) {
         errno = 0;
         DIR* dp = opendir("./detect");
         if (dp != NULL) {
@@ -273,7 +273,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCo
     //
     // ------------------------------------------------------------------------
     //
-    svr.Get("/debug/lift",  [&](const Request &req, Response &res) {
+    svr.Get("/debug/lift",  [&](__attribute__((unused)) const Request &req, Response &res) {
         shared->harrowLifted.store(true);
         puts("/debug/lift - shared->harrowLifted.store(true)");
         res.status = 200;
@@ -281,7 +281,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCo
     //
     // ------------------------------------------------------------------------
     //
-    svr.Get("/debug/unlift",  [&](const Request &req, Response &res) {
+    svr.Get("/debug/unlift", [&](__attribute__((unused)) const Request &req, Response &res) {
         shared->harrowLifted.store(false);
         puts("/debug/lift - shared->harrowLifted.store(false)");
         res.status = 200;

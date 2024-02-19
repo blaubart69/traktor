@@ -2,6 +2,11 @@ set(EXE_TRAKTOR traktor)
 #set(CMAKE_CXX_FLAGS "-march=native")
 set(CMAKE_CXX_FLAGS "-gdwarf-4")
 
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
+
+
+
 project(${EXE_TRAKTOR} VERSION 1.2.0)
 
 set(SOURCES 
@@ -23,6 +28,7 @@ set(SOURCES
     src/harrow.h
     src/harrow.cpp
     src/thread_center_harrow.cpp
+    src/calculate.cpp
     src/pipeline/auto_reset_event.cpp
     src/pipeline/auto_reset_event.hpp
     src/pipeline/Postbox.cpp
@@ -32,6 +38,8 @@ set(SOURCES
 )
 
 add_executable(${EXE_TRAKTOR} ${SOURCES})
+
+target_compile_options(${EXE_TRAKTOR} PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
 target_compile_features(${EXE_TRAKTOR} PRIVATE cxx_std_14)
 
@@ -74,3 +82,5 @@ target_include_directories(${EXE_TRAKTOR} PRIVATE ${OpenCV_INCLUDE_DIRS})
 #set(CPACK_PROJECT_NAME    ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 #include(CPack)
+
+message(STATUS "Compiler: ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_VERSION}")

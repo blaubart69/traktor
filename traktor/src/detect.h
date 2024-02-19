@@ -46,7 +46,7 @@ struct DetectResult
     DETECT_STATE state;
     Contoures    contoures;
     bool         is_in_threshold;
-    float        avg_threshold;
+    int          avg_delta_px;
 
     void reset() 
     {
@@ -56,8 +56,8 @@ struct DetectResult
 
 struct DetectContext
 {
-    Shared* shared;
     DetectCounter* stats;
+    Shared* shared;
     Harrow* harrow;
     bool showDebugWindows = false;
     std::unique_ptr<cv::Mat> status_bar = nullptr;

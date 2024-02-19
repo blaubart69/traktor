@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "shared.h"
+#include "detect.h"
 #include "calculate.h"
 
 //
