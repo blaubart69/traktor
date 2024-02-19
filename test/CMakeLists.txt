@@ -3,7 +3,7 @@ project(${EXE_TEST} LANGUAGES CXX)
 
 set(SOURCES 
     traktor_test.cpp
-    ../traktor/src/calculate.cpp
+    # ../traktor/src/calculate.cpp
 )
 
 add_executable(${EXE_TEST} ${SOURCES})

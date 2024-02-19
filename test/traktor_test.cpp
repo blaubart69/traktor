@@ -3,6 +3,13 @@
 #include "shared.h"
 #include "calculate.h"
 
+//
+// 2024-02-19 Spindler
+//  I know, this is a hacky workaround to test the the "private" functions in calculate.cpp
+//  But I want to declare the as static ("private") to get them inlined by the compiler
+//
+#include "calculate.cpp"
+
 const int x_screen = 640;
 const int y_screen = 480;
 
