@@ -100,6 +100,16 @@ struct DetectSettings {
 
         void recalculate_rowCount()
         {
+            if (reflineSettings.x_half == 0)
+            {
+                puts("W: recalculate_rowCount() cannot calculate because x_half == 0");
+                return;  
+            }
+            if (reflineSettings.rowSpacingPx == 0)
+            {
+                puts("W: recalculate_rowCount() cannot calculate because rowSpacingPx == 0");
+                return;  
+            }
             const int x_max_outer_row = ( imageSettings.frame_rows / reflineSettings.x_half ) * reflineSettings.y_fluchtpunkt;
             reflineSettings.half_row_count_auto = x_max_outer_row / reflineSettings.rowSpacingPx;
         }

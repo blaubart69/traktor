@@ -116,11 +116,10 @@ static void write_text_to_status_bar(const cv::String& text, cv::Mat* bar)
     cv::putText(*bar, text, cv::Point(10, 19), cv::FONT_HERSHEY_SIMPLEX, 0.8, RED, 2);
 }
 
-static void draw_threshold_bar(const bool within_threshold, const float avg_threshold, const int x_half, cv::Mat* bar)
+static void draw_threshold_bar(const bool within_threshold, const int avg_delta_px, const int x_half, cv::Mat* bar)
 {
     const cv::Scalar& color_overall_delta = within_threshold ? GREEN : RED;
-    const int delta_status_px = (float)avg_threshold * (float)x_half;
-    cv::rectangle(*bar, cv::Point(x_half,0), cv::Point(x_half + delta_status_px,bar->rows), color_overall_delta, cv::FILLED);
+    cv::rectangle(*bar, cv::Point(x_half,0), cv::Point(x_half + avg_delta_px,bar->rows), color_overall_delta, cv::FILLED);
 }
 
 static void draw_status_bar(cv::Mat& frame, const DetectResult& detect_result, const int x_half, std::unique_ptr<cv::Mat>& status_bar)
@@ -169,7 +168,7 @@ WORKER_RC encode_main(Workitem* work, EncodeContext* ctx)
 
     if ( ! cv::imencode(JPG, work->frame, ctx->jpeg_buffer, JPEGparams) )
     {
-        printf("E: error encoding frame to JPEG\n");
+        puts("E: error encoding frame to JPEG");
     }
     else if ( ! (ctx->sendJPEGbytes)(ctx->jpeg_buffer, &bytes_sent) )
     {

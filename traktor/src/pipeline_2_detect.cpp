@@ -248,7 +248,7 @@ bool is_within_threshold(const float avg_threshold, const int rowSpacingPx, cons
 */
 
 
-HARROW_DIRECTION get_harrow_direction(const bool is_within_threshold, const float avg_threshold)
+HARROW_DIRECTION get_harrow_direction(const bool is_within_threshold, const int avg_threshold)
 {
     HARROW_DIRECTION direction;
 

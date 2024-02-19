@@ -24,17 +24,17 @@ struct RefLineSettings
 struct CalcSettings
 {
     const int x_half;
-    const int y_fluchtpunkt;
+    const int rowPerspectivePx;
     const int y_baseline;
     const int offset;
     const unsigned int refline_distance;
     const unsigned int half_refline_distance;
     const unsigned int range_baseline;
 
-    CalcSettings(int x_half, int y_screen_size, int y_fluchtpunkt, int refline_distance, int offset, int row_count) 
+    CalcSettings(int x_half, int y_screen_size, int rowPerspectivePx, int refline_distance, int offset, int row_count) 
     :   x_half(x_half)
-    ,   y_fluchtpunkt(y_fluchtpunkt)
-    ,   y_baseline(y_fluchtpunkt + y_screen_size)
+    ,   rowPerspectivePx(rowPerspectivePx)
+    ,   y_baseline(rowPerspectivePx + y_screen_size)
     ,   offset(offset)
     ,   refline_distance(refline_distance)
     ,   half_refline_distance(refline_distance / 2)
@@ -45,11 +45,11 @@ struct CalcSettings
 //
 // 0,0 ... fluchtpunkt
 //
-PRIVATE CoordPoint project_screen_point_to_coord(const int x_point_screen, const int y_point_screen, const int x_half, const int y_flucht) 
+PRIVATE CoordPoint project_screen_point_to_coord(const int x_point_screen, const int y_point_screen, const int x_half, const int rowPerspectivePx) 
 {
     CoordPoint p;
     p.x = x_point_screen - x_half;
-    p.y = y_flucht + y_point_screen;
+    p.y = rowPerspectivePx + y_point_screen;
     return p;
 }
 //
@@ -96,7 +96,7 @@ PRIVATE bool is_within_range(int x, const unsigned int range_baseline)
     return (unsigned int)std::abs(x) < range_baseline;
 }
 
-PRIVATE int project_x_inbetween_first_row(const int x_baseline, const unsigned int refline_distance) 
+PRIVATE int project_x_inbetween_first_row(const int x_baseline, const int refline_distance) 
 {
     if ( refline_distance == 0)
     {
@@ -107,7 +107,7 @@ PRIVATE int project_x_inbetween_first_row(const int x_baseline, const unsigned i
     }
     else
     {
-        return x_baseline % refline_distance;
+        return x_baseline % (int)refline_distance;
     }
 }
 
@@ -121,7 +121,7 @@ PRIVATE int distance_to_nearest_refline_on_baseline(const int x_first_row, const
 PRIVATE bool calc_delta_from_nearest_refline(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels)
 {
     CoordPoint p;
-    p = project_screen_point_to_coord(x_screen,y_screen, settings.x_half, settings.y_fluchtpunkt);
+    p = project_screen_point_to_coord(x_screen,y_screen, settings.x_half, settings.rowPerspectivePx);
 
     int x_baseline;
     if ( ! project_x_onto_baseline(p, settings.y_baseline, &x_baseline ) ) 
@@ -129,16 +129,25 @@ PRIVATE bool calc_delta_from_nearest_refline(const int x_screen, const int y_scr
         return false;
     }
 
-    x_baseline = apply_offset(x_baseline, settings.offset);
+    const int x_baseline_offset = apply_offset(x_baseline, settings.offset);
 
-    if ( ! is_within_range(x_baseline, settings.range_baseline) )
+    if ( ! is_within_range(x_baseline_offset, settings.range_baseline) )
     {
         return false;
     }
 
-    x_baseline = project_x_inbetween_first_row(x_baseline, settings.refline_distance);
+    const int x_baseline_first_row = project_x_inbetween_first_row(x_baseline_offset, settings.refline_distance);
 
-    *delta_pixels = distance_to_nearest_refline_on_baseline(x_baseline, settings.refline_distance, settings.half_refline_distance);
+    *delta_pixels = distance_to_nearest_refline_on_baseline(x_baseline_first_row, settings.refline_distance, settings.half_refline_distance);
+
+    printf("rowPerspectivePx: %5d screen x/y: %5d/%5d coord x/y: %5d/%5d x_baseline: %5d x_offset: %5d x_first: %5d delta_px: %5d\n", 
+        settings.rowPerspectivePx
+        , x_screen, y_screen
+        , p.x, p.y
+        , x_baseline
+        , x_baseline_offset
+        , x_baseline_first_row
+        , *delta_pixels);
 
     return true;
 }
@@ -148,7 +157,7 @@ bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_row
     CalcSettings calcSettings(
         refSettings.x_half
         , frame_rows
-        , refSettings.y_fluchtpunkt
+        , refSettings.rowPerspectivePx
         , refSettings.rowSpacingPx
         , refSettings.offset
         , refSettings.get_half_row_count()
