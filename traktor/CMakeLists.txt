@@ -5,8 +5,6 @@ set(CMAKE_CXX_FLAGS "-gdwarf-4")
 add_compile_options(-fsanitize=address)
 add_link_options(-fsanitize=address)
 
-
-
 project(${EXE_TRAKTOR} VERSION 1.2.0)
 
 set(SOURCES 
