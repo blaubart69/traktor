@@ -197,7 +197,7 @@ void bench_v16(const char* impl_name, size_t frames)
 
 int main(int argc, char* argv[])
 {
-    size_t frames = 1;
+    size_t frames = 30;
 
     for ( int i=1; i <= 1; i++)
     {
