@@ -60,25 +60,26 @@ void bench_classic(size_t frames)
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>( end - start ).count();
 
-    printf("CLASSIC           : %11.3f ms, points: %lu, delta_pixels_sum: %f, in: %lu, out: %lu\n", 
+    printf("CLASSIC           : %11.3f ms, points: %lu, delta_pixels_sum: %5.1f, in: %lu, out: %lu\n", 
         ( (float)duration / 1000000 )
         , points, delta_pixels_sum, in_range, out_range );
 
 }
 
-typedef bool (*pfBaselineImpl)(int,int, const CalcSettings&, int*);
+//typedef bool (*pfBaselineImpl)(int,int, const CalcSettings&, int*);
 
+template<typename S, typename pfImpl>
 void run_baseline_impl(
     int screen_width, int screen_height,
     int *delta_pixels_sum, size_t *in_range, size_t *out_range, size_t *points, 
-    const CalcSettings& calcSettings, pfBaselineImpl baselineImpl)
+    const S& calcSettings, pfImpl baselineImpl)
 {
     for ( int x=0; x<screen_width;x++) 
     {
         for ( int y=0; y<screen_height;y++) 
         {
             int delta_pixels;
-            if ( ! baselineImpl(x,y,calcSettings, &delta_pixels) )
+            if ( ! baselineImpl(x, y, calcSettings, &delta_pixels) )
             {
                 *out_range += 1;
             }
@@ -91,13 +92,13 @@ void run_baseline_impl(
         }
     }
 }
-
-void bench_a_baseline(const char* impl_name, size_t frames, pfBaselineImpl baselineImpl)
+template<typename tySettings, typename pfImpl>
+void bench_a_baseline(const char* impl_name, size_t frames, pfImpl baselineImpl)
 {
     const int screen_width = 960;
     const int screen_height = 720;
 
-    CalcSettings calcSettings(
+    tySettings calcSettings(
           screen_width / 2
         , screen_height
         , 0     // refSettings.rowPerspectivePx
@@ -121,7 +122,7 @@ void bench_a_baseline(const char* impl_name, size_t frames, pfBaselineImpl basel
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>( end - start ).count();
 
-    printf("%s: %11.3f ms, points: %lu, delta_pixels_sum: %d, in: %lu, out: %lu\n", 
+    printf("%s: %11.3f ms, points: %lu, delta_pixels_sum: %5d, in: %lu, out: %lu\n", 
         impl_name
         , ( (float)duration / 1000000 )
         , points, delta_pixels_sum, in_range, out_range );
@@ -132,13 +133,14 @@ int main(int argc, char* argv[])
 {
     size_t frames = 30 * 10;
 
-    for ( int i=1; i <= 5; i++)
+    for ( int i=1; i <= 1; i++)
     {
-        printf("=== %d. ===\n", i);
+        printf("--- %d. ---\n", i);
         bench_classic(frames);
-        bench_a_baseline("baseline float    ", frames, calc_baseline_delta_from_nearest_refline);
-        bench_a_baseline("baseline int      ", frames, calc_baseline_delta_from_nearest_refline_int);
-        bench_a_baseline("baseline float mul", frames, calc_baseline_delta_from_nearest_refline_float_mul);
+        bench_a_baseline<CalcSettings>     ("baseline float    ", frames, calc_baseline_delta_from_nearest_refline);
+        bench_a_baseline<CalcSettings>     ("baseline int (mul)", frames, calc_baseline_delta_from_nearest_refline_int);
+        bench_a_baseline<CalcSettings>     ("baseline float mul", frames, calc_baseline_delta_from_nearest_refline_float_mul);
+        bench_a_baseline<CalcSettingsShort>("baseline short int", frames, calc_baseline_delta_from_nearest_refline_short_int);
     }
 
     return 0;

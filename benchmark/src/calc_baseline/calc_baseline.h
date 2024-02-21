@@ -21,6 +21,29 @@ struct CalcSettings
     {}
 };
 
+struct CalcSettingsShort
+{
+    const int16_t x_half;
+    const int16_t rowPerspectivePx;
+    const int16_t y_baseline;
+    const int16_t offset;
+    const int16_t refline_distance;
+    const int16_t half_refline_distance;
+    const int16_t range_baseline;
+
+    CalcSettingsShort(int16_t x_half, int16_t y_screen_size, int16_t rowPerspectivePx, int16_t refline_distance, int16_t offset, int16_t row_count) 
+    :   x_half(x_half)
+    ,   rowPerspectivePx(rowPerspectivePx)
+    ,   y_baseline(rowPerspectivePx + y_screen_size)
+    ,   offset(offset)
+    ,   refline_distance(refline_distance)
+    ,   half_refline_distance(refline_distance / 2)
+    ,   range_baseline( ( refline_distance * row_count ) + (refline_distance / 2) )
+    {}
+};
+
+
 bool calc_baseline_delta_from_nearest_refline(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
 bool calc_baseline_delta_from_nearest_refline_int(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
 bool calc_baseline_delta_from_nearest_refline_float_mul(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
+bool calc_baseline_delta_from_nearest_refline_short_int(const int16_t x_screen, const int16_t y_screen, const CalcSettingsShort& settings, int *delta_pixels);
