@@ -13,7 +13,7 @@ void print_result(const char* impl_name, std::chrono::_V2::system_clock::rep dur
         , points, delta_pixels_sum, in_range, out_range );
 }
 
-void run_classic(float *delta_pixels_sum, size_t *in_range, size_t *out_range, size_t *points)
+void run_classic(int rows, float *delta_pixels_sum, size_t *in_range, size_t *out_range, size_t *points)
 {
     const int screen_width = 960;
     const int screen_height = 720;
@@ -27,7 +27,7 @@ void run_classic(float *delta_pixels_sum, size_t *in_range, size_t *out_range, s
     ref.x_half = screen_width / 2;
     ref.y_fluchtpunkt = screen_height + ref.rowPerspectivePx;
     ref.rowMax = 0;
-    ref.half_row_count_auto = 2;
+    ref.half_row_count_auto = rows;
 
     Point p;
     for ( int x=0; x<screen_width;x++) 
@@ -52,7 +52,7 @@ void run_classic(float *delta_pixels_sum, size_t *in_range, size_t *out_range, s
         }
     }
 }
-void bench_classic(const char* impl_name,size_t frames)
+void bench_classic(const char* impl_name,size_t frames, int rows)
 {
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -63,7 +63,7 @@ void bench_classic(const char* impl_name,size_t frames)
 
     for (size_t i=0; i < frames; i++) 
     {
-        run_classic(&delta_pixels_sum, &in_range, &out_range, &points);
+        run_classic(rows, &delta_pixels_sum, &in_range, &out_range, &points);
     }
 
     auto end = std::chrono::high_resolution_clock::now();
@@ -99,7 +99,7 @@ void run_baseline_impl(
     }
 }
 template<typename tySettings, typename pfImpl>
-void bench_a_baseline(const char* impl_name, size_t frames, pfImpl baselineImpl)
+void bench_a_baseline(const char* impl_name, size_t frames, int rows, pfImpl baselineImpl)
 {
     const int screen_width = 960;
     const int screen_height = 720;
@@ -110,7 +110,7 @@ void bench_a_baseline(const char* impl_name, size_t frames, pfImpl baselineImpl)
         , 0     // refSettings.rowPerspectivePx
         , 160   // refSettings.rowSpacingPx
         , 0     // refSettings.offset
-        , 2     // row_count
+        , rows     // row_count
     );
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -131,7 +131,7 @@ void bench_a_baseline(const char* impl_name, size_t frames, pfImpl baselineImpl)
     print_result(impl_name, duration, points, delta_pixels_sum, in_range, out_range);
 }
 
-void bench_v16(const char* impl_name, size_t frames)
+void bench_v16(const char* impl_name, size_t frames, int rows)
 {
     const int screen_width = 960;
     const int screen_height = 720;
@@ -142,7 +142,7 @@ void bench_v16(const char* impl_name, size_t frames)
         , 0     // refSettings.rowPerspectivePx
         , 160   // refSettings.rowSpacingPx
         , 0     // refSettings.offset
-        , 2     // row_count
+        , rows     // row_count
     );
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -152,7 +152,7 @@ void bench_v16(const char* impl_name, size_t frames)
         size_t out_range = 0;
         size_t points = 0;
 
-        bool ok[ 16 ];
+        
         int16_t v_x[ 16 ];
         int16_t v_y[ 16 ];
 
@@ -175,6 +175,7 @@ void bench_v16(const char* impl_name, size_t frames)
                         v_idx = 0;
 
                         int delta_pixels;
+                        bool ok[ 16 ] = {true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true};
                         calc_delta_from_nearest_refline_16(v_x, v_y, calcSettings, &delta_pixels, ok );
                         delta_pixels_sum += delta_pixels;
 
@@ -198,16 +199,17 @@ void bench_v16(const char* impl_name, size_t frames)
 int main(int argc, char* argv[])
 {
     size_t frames = 30;
+    int rows = 3;
 
     for ( int i=1; i <= 1; i++)
     {
         printf("--- %d. ---\n", i);
-        bench_classic                      ("Classic",            frames);
-        bench_a_baseline<CalcSettings>     ("baseline float",     frames, calc_baseline_delta_from_nearest_refline);
-        bench_a_baseline<CalcSettings>     ("baseline int (mul)", frames, calc_baseline_delta_from_nearest_refline_int);
-        bench_a_baseline<CalcSettings>     ("baseline float mul", frames, calc_baseline_delta_from_nearest_refline_float_mul);
-        bench_a_baseline<CalcSettingsShort>("baseline short int", frames, calc_baseline_delta_from_nearest_refline_short_int);
-        bench_v16                          ("baseline v16",       frames);
+        bench_classic                      ("Classic",            frames, rows);
+        bench_a_baseline<CalcSettings>     ("baseline float",     frames, rows, calc_baseline_delta_from_nearest_refline);
+        bench_a_baseline<CalcSettings>     ("baseline int (mul)", frames, rows, calc_baseline_delta_from_nearest_refline_int);
+        bench_a_baseline<CalcSettings>     ("baseline float mul", frames, rows, calc_baseline_delta_from_nearest_refline_float_mul);
+        bench_a_baseline<CalcSettingsShort>("baseline short int", frames, rows, calc_baseline_delta_from_nearest_refline_short_int);
+        bench_v16                          ("baseline v16",       frames, rows);
     }
 
     return 0;

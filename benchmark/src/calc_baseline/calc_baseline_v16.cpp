@@ -50,7 +50,14 @@ PRIVATE void project_screen_point_to_coord_16(const short int * __restrict x_poi
 PRIVATE void project_x_onto_baseline_16(const CoordPoint * __restrict point, const short int y_baseline, int32_t * __restrict x_base_line, bool * __restrict ok) 
 {
     for ( int i = 0; i < 16; i++ ) {
-        x_base_line[ i ] = ( y_baseline * point[ i ].x ) / (float)point[ i ].y;
+        if ( point[ i ].y == 0 )
+        {
+            ok[ i ] = false;
+        }
+        else
+        {
+            x_base_line[ i ] = ( y_baseline * point[ i ].x ) / point[ i ].y;
+        }
     }
 }
 
@@ -65,7 +72,10 @@ PRIVATE void is_within_range_16(int32_t * __restrict x, const int16_t range_base
 {
     for ( int i = 0; i < 16; i++ ) {
         //ok[ i ] = ((unsigned short int)std::abs(x[ i ]) < range_baseline ) ? false : ok[ i ];
-        ok[ i ] =  std::abs(x[ i ]) < range_baseline ;
+        if ( std::abs(x[ i ]) > range_baseline )
+        {
+            ok[ i ] = false;
+        }
     }
 }
 
