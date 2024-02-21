@@ -11,6 +11,7 @@ set(SOURCES
     src/calc_baseline/calc_baseline_int.cpp
     src/calc_baseline/calc_baseline_short_int.cpp
     src/calc_baseline/calc_baseline_float_mul.cpp
+    src/calc_baseline/calc_baseline_v16.cpp
     src/calc_classic/calc_classic.h
     src/calc_classic/calc_classic.cpp
     # ../traktor/src/calculate.cpp
@@ -18,4 +19,10 @@ set(SOURCES
 
 add_executable(${PROJECT} ${SOURCES})
 
-target_compile_features(${PROJECT} PRIVATE cxx_std_14)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+target_compile_features(${PROJECT} PRIVATE cxx_std_17)
+
+message(STATUS "Compiler: ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_VERSION}")
