@@ -131,10 +131,15 @@ void bench_a_baseline(const char* impl_name, size_t frames, pfBaselineImpl basel
 int main(int argc, char* argv[])
 {
     size_t frames = 30 * 10;
-    bench_classic(frames);
-    bench_a_baseline("baseline float    ", frames, calc_baseline_delta_from_nearest_refline);
-    bench_a_baseline("baseline int      ", frames, calc_baseline_delta_from_nearest_refline_without_float);
-    bench_a_baseline("baseline float mul", frames, calc_baseline_delta_from_nearest_refline_float_mul);
+
+    for ( int i=1; i <= 5; i++)
+    {
+        printf("=== %d. ===\n", i);
+        bench_classic(frames);
+        bench_a_baseline("baseline float    ", frames, calc_baseline_delta_from_nearest_refline);
+        bench_a_baseline("baseline int      ", frames, calc_baseline_delta_from_nearest_refline_int);
+        bench_a_baseline("baseline float mul", frames, calc_baseline_delta_from_nearest_refline_float_mul);
+    }
 
     return 0;
 }
