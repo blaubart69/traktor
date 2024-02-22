@@ -196,14 +196,15 @@ void bench_v16(const char* impl_name, size_t frames, int rows)
     print_result(impl_name, duration, points, delta_pixels_sum, in_range, out_range);
 }
 
-int main(int argc, char* argv[])
+//int main(int argc, char* argv[])
+int main()
 {
     size_t frames = 30;
     int rows = 3;
 
-    for ( int i=1; i <= 1; i++)
+    for ( int i=1; i <= 2; i++)
     {
-        printf("--- %d. ---\n", i);
+        printf("--- %d. rows: %d, frames: %lu---\n", i, rows, frames);
         bench_classic                      ("Classic",            frames, rows);
         bench_a_baseline<CalcSettings>     ("baseline float",     frames, rows, calc_baseline_delta_from_nearest_refline);
         bench_a_baseline<CalcSettings>     ("baseline int (mul)", frames, rows, calc_baseline_delta_from_nearest_refline_int);
