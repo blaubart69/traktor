@@ -49,3 +49,5 @@ bool calc_baseline_delta_from_nearest_refline_float_mul(const int x_screen, cons
 bool calc_baseline_delta_from_nearest_refline_short_int(const int16_t x_screen, const int16_t y_screen, const CalcSettingsShort& settings, int *delta_pixels);
 
 void calc_delta_from_nearest_refline_16(const short int * __restrict x_screen, const short int * __restrict y_screen, const CalcSettingsShort& settings, int32_t *my_pixels, bool * __restrict ok);
+
+void test_hwy_calc_delta_pixels();
