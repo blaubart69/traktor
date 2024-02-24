@@ -200,7 +200,7 @@ void bench_v16(const char* impl_name, size_t frames, int rows)
 int main()
 {
 
-    test_hwy_calc_delta_pixels();
+    run_test_hwy_calc_delta_pixels();
 
     return 0;
 

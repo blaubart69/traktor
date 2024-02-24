@@ -15,12 +15,13 @@ namespace hn = hwy::HWY_NAMESPACE;
 #include "calc_baseline.h"
 
 template <class DF, class DI>
-void ONE_delta_pixels(
+int32_t ONE_delta_pixels(
 	const DF df
   , const DI di		
   , const CalcSettings& settings
   ,	const int32_t * HWY_RESTRICT x_point_screen
   , const int32_t * HWY_RESTRICT y_point_screen
+  , int32_t *delta_pixels
 )
 {
 	//
@@ -36,6 +37,9 @@ void ONE_delta_pixels(
 
 	//
 	// 2. project to onto baseline
+	//		!!! make sure "y_coord" IS NEVER 0 			!!!
+	//		!!! so we don't have to deal with INFINITY 	!!!
+	//		hint for myself: y_fluchtpunkt > 0
 	//
 	const auto v_y_baseline = hn::Set(df, (float)settings.y_baseline);
 	
@@ -43,13 +47,69 @@ void ONE_delta_pixels(
 	auto v_y_coord_float = hn::ConvertTo(df, v_y_coord);
 
 	// x_base_line[ i ] = ( y_baseline * point[ i ].x ) / point[ i ].y;
-	auto v_x_baseline = hn::Div( hn::Mul( v_x_coord_float, v_y_baseline), v_y_coord_float );
+	auto v_x_baseline_float = hn::Div( hn::Mul( v_x_coord_float, v_y_baseline), v_y_coord_float );
+	auto v_x_baseline = hn::ConvertTo(di, v_x_baseline_float);
 
-	hn::Print(df, "x_baseline", v_x_baseline, 0, hn::Lanes(df));
+	//
+	// 3. apply offset
+	//
+	const auto v_offset = hn::Set(di, settings.offset);
+	v_x_baseline = hn::Add( v_x_baseline, v_offset );
+
+	//
+	// 4. is_within_range
+	//
+	const auto v_range_baseline = hn::Set(di, settings.range_baseline);
+	auto mask_within_range = hn::Lt( hn::Abs(v_x_baseline), v_range_baseline);
+
+	if ( hn::AllFalse(di, mask_within_range) )
+	{
+		return 0;
+	}
 	
+	//
+	// 5. project_x_inbetween_first_row 
+	//	==> x_baseline % (int)refline_distance
+	//
+	// V: {u,i} \ V MaskedModOr(V no, M m, V a, V b): returns a[i] % b[i] or no[i] if m[i] is false.
+	const auto v_refline_distance = hn::Set(di, settings.refline_distance);
+	auto v_x_one_row = hn::MaskedModOr( hn::Zero(di) , mask_within_range, v_x_baseline, v_refline_distance );
+
+	//
+	// 6. distance_to_nearest_refline_on_baseline
+	//
+	//		if ( x_first_row >=  half_refline_distance ) return x_first_row - refline_distance;
+    //		if ( x_first_row <= -half_refline_distance ) return x_first_row + refline_distance;
+    //		return x_first_row;
+	//
+	const auto       v_half_refline_distance = hn::Set(di, settings.half_refline_distance);
+	const auto v_minus_half_refline_distance = hn::Neg(           v_half_refline_distance);
+
+	auto mask_gt = hn::Gt(v_x_one_row, v_half_refline_distance);
+	auto mask_lt = hn::Lt(v_x_one_row, v_minus_half_refline_distance);
+
+	auto x_result_gt = hn::MaskedSubOr( hn::Zero(di), mask_gt, v_x_one_row, v_refline_distance);
+	auto x_result_lt = hn::MaskedAddOr( hn::Zero(di), mask_lt, v_x_one_row, v_refline_distance);
+
+	auto mask_rest       = hn::And( hn::Not(mask_gt), hn::Not(mask_lt) );
+	auto mask_valid_rest = hn::And( mask_rest, mask_within_range );
+
+	auto x_result_valid_rest = hn::IfThenElse( mask_valid_rest, v_x_one_row, hn::Zero(di) );
+	 
+	*delta_pixels = hn::ReduceSum(di, x_result_gt)
+				  + hn::ReduceSum(di, x_result_lt)
+				  + hn::ReduceSum(di, x_result_valid_rest);
+
+	hn::Print(di, "v_x_baseline", 		v_x_baseline, 	0, hn::Lanes(df));
+
+	const auto ones = hn::Set(di, 1);
+	auto valid_points = hn::IfThenElse( mask_within_range, ones, hn::Zero(di) );
+	int32_t count_valid_points = hn::ReduceSum(di, valid_points);
+
+	return count_valid_points;
 }
 
-void hwy_calc_delta_pixels(
+int32_t hwy_calc_delta_pixels(
 	  const size_t	size
   	, const int32_t* __restrict x_screen
   	, const int32_t* __restrict y_screen
@@ -62,15 +122,19 @@ void hwy_calc_delta_pixels(
 
 	printf("lanes int32_t: %lu\n", N);
 	printf("lanes float  : %lu\n", hn::Lanes(df));
+
+	size_t sum_delta_pixels = 0;
+	int32_t valid_points = 0;
 	for (size_t i = 0; i < size; i += N) 
 	{
-		ONE_delta_pixels(df,di, settings, x_screen + i, y_screen + i);
+		valid_points += ONE_delta_pixels(df, di, settings, x_screen + i, y_screen + i, delta_pixels);
 	}
+	printf("SUM delta: %zu, valid points: %d\n",sum_delta_pixels, valid_points);
+	return sum_delta_pixels;
 }
 
 void test_hwy_calc_delta_pixels()
 {
-	
 	auto targets = hwy::SupportedAndGeneratedTargets();
 	for (auto t : targets)
 	{
@@ -83,7 +147,7 @@ void test_hwy_calc_delta_pixels()
         , 0     // refSettings.rowPerspectivePx
         , 160   // refSettings.rowSpacingPx
         , 0     // refSettings.offset
-        , 3     // row_count
+        , 1    // row_count
     );
 
 	int32_t x[16] __attribute__ ((aligned (64)));
@@ -103,7 +167,7 @@ void test_hwy_calc_delta_pixels()
 }
 HWY_AFTER_NAMESPACE();
 
-void test_hwy_calc_delta_pixels()
+void run_test_hwy_calc_delta_pixels()
 {
-	deltapx::HWY_NAMESPACE::test_hwy_calc_delta_pixels();
+	deltapx::HWY_STATIC_DISPATCH(test_hwy_calc_delta_pixels)();
 }
