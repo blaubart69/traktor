@@ -2,20 +2,21 @@
 #include "hwy/print-inl.h"
 //#include "hwy/detect_targets.h"
 
+#include "calc_baseline.h"
+
 HWY_BEFORE_NAMESPACE();
 
 namespace deltapx {
 // This namespace name is unique per target, which allows code for multiple
 // targets to co-exist in the same translation unit. Required when using dynamic
 // dispatch, otherwise optional.
+
 namespace HWY_NAMESPACE {
 
 namespace hn = hwy::HWY_NAMESPACE;
 
-#include "calc_baseline.h"
-
 template <class DF, class DI>
-int32_t ONE_delta_pixels(
+static int32_t ONE_delta_pixels(
 	const DF df
   , const DI di		
   , const CalcSettings& settings
@@ -85,8 +86,8 @@ int32_t ONE_delta_pixels(
 	const auto       v_half_refline_distance = hn::Set(di, settings.half_refline_distance);
 	const auto v_minus_half_refline_distance = hn::Neg(           v_half_refline_distance);
 
-	auto mask_gt = hn::Gt(v_x_one_row, v_half_refline_distance);
-	auto mask_lt = hn::Lt(v_x_one_row, v_minus_half_refline_distance);
+	const auto mask_gt = hn::Gt(v_x_one_row, v_half_refline_distance);
+	const auto mask_lt = hn::Lt(v_x_one_row, v_minus_half_refline_distance);
 
 	auto x_result_gt = hn::MaskedSubOr( hn::Zero(di), mask_gt, v_x_one_row, v_refline_distance);
 	auto x_result_lt = hn::MaskedAddOr( hn::Zero(di), mask_lt, v_x_one_row, v_refline_distance);
@@ -100,7 +101,14 @@ int32_t ONE_delta_pixels(
 				  + hn::ReduceSum(di, x_result_lt)
 				  + hn::ReduceSum(di, x_result_valid_rest);
 
-	hn::Print(di, "v_x_baseline", 		v_x_baseline, 	0, hn::Lanes(df));
+	#ifdef DEBUG
+	hn::Print(di, "v_x_baseline       ", v_x_baseline, 	        0, hn::Lanes(di));
+	hn::Print(di, "v_x_one_row        ", v_x_one_row, 	        0, hn::Lanes(di));
+	hn::Print(di, "x_result_gt        ", x_result_gt, 	        0, hn::Lanes(di));
+	hn::Print(di, "x_result_lt        ", x_result_lt, 	        0, hn::Lanes(di));
+	hn::Print(di, "x_result_valid_rest", x_result_valid_rest, 	0, hn::Lanes(di));
+	printf("----\n");
+	#endif
 
 	const auto ones = hn::Set(di, 1);
 	auto valid_points = hn::IfThenElse( mask_within_range, ones, hn::Zero(di) );
@@ -109,7 +117,7 @@ int32_t ONE_delta_pixels(
 	return count_valid_points;
 }
 
-int32_t hwy_calc_delta_pixels(
+static int32_t hwy_calc_delta_pixels(
 	  const size_t	size
   	, const int32_t* __restrict x_screen
   	, const int32_t* __restrict y_screen
@@ -120,8 +128,10 @@ int32_t hwy_calc_delta_pixels(
 	const hn::ScalableTag<int32_t> di;
   	const size_t N = hn::Lanes(di);
 
+	#ifdef DEBUG
 	printf("lanes int32_t: %lu\n", N);
 	printf("lanes float  : %lu\n", hn::Lanes(df));
+	#endif
 
 	size_t sum_delta_pixels = 0;
 	int32_t valid_points = 0;
@@ -129,45 +139,29 @@ int32_t hwy_calc_delta_pixels(
 	{
 		valid_points += ONE_delta_pixels(df, di, settings, x_screen + i, y_screen + i, delta_pixels);
 	}
+
+	#ifdef DEBUG
 	printf("SUM delta: %zu, valid points: %d\n",sum_delta_pixels, valid_points);
+	#endif
+
 	return sum_delta_pixels;
 }
 
-void test_hwy_calc_delta_pixels()
-{
-	auto targets = hwy::SupportedAndGeneratedTargets();
-	for (auto t : targets)
-	{
-		printf("TargetName: %s\n",hwy::TargetName(t));
-	}
 
-	CalcSettings calcSettings(
-          640 / 2
-        , 480
-        , 0     // refSettings.rowPerspectivePx
-        , 160   // refSettings.rowSpacingPx
-        , 0     // refSettings.offset
-        , 1    // row_count
-    );
-
-	int32_t x[16] __attribute__ ((aligned (64)));
-	int32_t y[16] __attribute__ ((aligned (64)));
-
-	for (int i=0; i < 16; i++)
-	{
-		x[i] = 240 + i * 10;
-		y[i] = 479;
-	}
-
-	int32_t delta_pixels;
-	hwy_calc_delta_pixels(16, x, y, calcSettings, &delta_pixels);
-}
 
 }
 }
 HWY_AFTER_NAMESPACE();
 
-void run_test_hwy_calc_delta_pixels()
-{
-	deltapx::HWY_STATIC_DISPATCH(test_hwy_calc_delta_pixels)();
+namespace deltapx {
+
+	void run_hwy_calc_delta_pixels(
+	  const size_t	size
+  	, const int32_t* __restrict x_screen
+  	, const int32_t* __restrict y_screen
+  	, const CalcSettings& settings
+  	, int32_t *delta_pixels )
+	{
+		HWY_STATIC_DISPATCH(hwy_calc_delta_pixels)(size, x_screen, y_screen, settings, delta_pixels );
+	}
 }

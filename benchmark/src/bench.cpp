@@ -196,11 +196,13 @@ void bench_v16(const char* impl_name, size_t frames, int rows)
     print_result(impl_name, duration, points, delta_pixels_sum, in_range, out_range);
 }
 
+void test_hwy_calc_delta_pixels();
+
 //int main(int argc, char* argv[])
 int main()
 {
 
-    run_test_hwy_calc_delta_pixels();
+   test_hwy_calc_delta_pixels();
 
     return 0;
 

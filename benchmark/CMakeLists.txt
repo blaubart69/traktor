@@ -15,7 +15,8 @@ set(SOURCES
     src/calc_baseline/calc_baseline_v16.cpp
     src/calc_classic/calc_classic.h
     src/calc_classic/calc_classic.cpp
-    src/calc_baseline/calc_baseline_highway.cc
+    src/calc_baseline/highway.cc
+    src/calc_baseline/test_highway.cpp
     /home/bee/dev/highway/hwy/print.cc
     /home/bee/dev/highway/hwy/targets.cc
     # ../traktor/src/calculate.cpp
@@ -30,6 +31,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 target_include_directories(${PROJECT} PRIVATE "/home/bee/dev/highway")
 
 target_compile_features(${PROJECT} PRIVATE cxx_std_17)
+target_compile_definitions(${PROJECT} PUBLIC "$<$<CONFIG:DEBUG>:DEBUG>")
+
 #target_compile_options(${PROJECT} PRIVATE -Wall -Wextra -Wpedantic -masm=intel -save-temps=obj -march=native)
 target_compile_options(${PROJECT} PRIVATE -mavx2 -march=native)
 # -march=native
