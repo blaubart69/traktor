@@ -4,16 +4,6 @@
 
 #include "calc_baseline.h"
 
-namespace deltapx {
-
-	void run_hwy_calc_delta_pixels(
-	  const size_t	size
-  	, const int32_t* __restrict x_screen
-  	, const int32_t* __restrict y_screen
-  	, const CalcSettings& settings
-  	, int32_t *delta_pixels );
-}
-
 void test_hwy_calc_delta_pixels()
 {
 	auto targets = hwy::SupportedAndGeneratedTargets();
@@ -43,5 +33,5 @@ void test_hwy_calc_delta_pixels()
 	int32_t delta_pixels;
 	x[0] = INT32_MAX;
 	x[15] = INT32_MIN;
-	deltapx::run_hwy_calc_delta_pixels(16, x, y, calcSettings, &delta_pixels);
+	int32_t valid_points = deltapx::run_hwy_calc_delta_pixels(16, x, y, calcSettings, &delta_pixels);
 }

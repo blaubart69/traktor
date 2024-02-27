@@ -196,15 +196,77 @@ void bench_v16(const char* impl_name, size_t frames, int rows)
     print_result(impl_name, duration, points, delta_pixels_sum, in_range, out_range);
 }
 
+void bench_highway(const char* impl_name, size_t frames, int rows)
+{
+    const int screen_width = 960;
+    const int screen_height = 720;
+
+    CalcSettings calcSettings(
+          screen_width / 2
+        , screen_height
+        , 0     // refSettings.rowPerspectivePx
+        , 160   // refSettings.rowSpacingPx
+        , 0     // refSettings.offset
+        , rows     // row_count
+    );
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+        #define N 32
+
+        int delta_pixels_sum = 0;
+        size_t in_range = 0;
+        size_t out_range = 0;
+        size_t points = 0;
+
+        int32_t v_x[ N ] __attribute__ ((aligned (128)));
+        int32_t v_y[ N ] __attribute__ ((aligned (128)));
+
+        uint8_t v_idx = 0;
+
+        for ( size_t i=0; i < frames; i++) 
+        {
+            for ( int16_t x=0; x<screen_width;x++) 
+            {
+                for ( int16_t y=0; y<screen_height;y++) 
+                {
+                    if ( v_idx < N )
+                    {
+                        v_x[v_idx] = x;
+                        v_y[v_idx] = y;
+                        v_idx++;
+                    }
+                    if ( v_idx == N )
+                    {
+                        v_idx = 0;
+
+                        int delta_pixels;
+                        int32_t valid_px = deltapx::run_hwy_calc_delta_pixels(N, v_x, v_y, calcSettings, &delta_pixels);
+                        in_range  +=      valid_px;
+                        out_range += (N - valid_px);
+                        delta_pixels_sum += delta_pixels;
+
+                        points += N;
+                    }
+                }
+            }
+        }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>( end - start ).count();
+
+    print_result(impl_name, duration, points, delta_pixels_sum, in_range, out_range);
+}
+
+
 void test_hwy_calc_delta_pixels();
 
 //int main(int argc, char* argv[])
 int main()
 {
 
-   test_hwy_calc_delta_pixels();
-
-    return 0;
+    //test_hwy_calc_delta_pixels();
+    //return 0;
 
     size_t frames = 30;
     int rows = 3;
@@ -218,6 +280,7 @@ int main()
         bench_a_baseline<CalcSettings>     ("baseline float mul", frames, rows, calc_baseline_delta_from_nearest_refline_float_mul);
         bench_a_baseline<CalcSettingsShort>("baseline short int", frames, rows, calc_baseline_delta_from_nearest_refline_short_int);
         bench_v16                          ("baseline v16",       frames, rows);
+        bench_highway                      ("highway",            frames, rows);
     }
 
     return 0;

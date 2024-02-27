@@ -1,6 +1,6 @@
 #include "hwy/highway.h"
 #include "hwy/print-inl.h"
-//#include "hwy/detect_targets.h"
+#include "hwy/detect_targets.h"
 
 #include "calc_baseline.h"
 
@@ -133,20 +133,21 @@ static int32_t hwy_calc_delta_pixels(
 	printf("lanes float  : %lu\n", hn::Lanes(df));
 	#endif
 
-	size_t sum_delta_pixels = 0;
+	//size_t sum_delta_pixels = 0;
 	int32_t valid_points = 0;
 	for (size_t i = 0; i < size; i += N) 
 	{
-		valid_points += ONE_delta_pixels(df, di, settings, x_screen + i, y_screen + i, delta_pixels);
+		int32_t ONE_delta_px = 0;
+		valid_points += ONE_delta_pixels(df, di, settings, x_screen + i, y_screen + i, &ONE_delta_px);
+		*delta_pixels += ONE_delta_px;
 	}
 
 	#ifdef DEBUG
 	printf("SUM delta: %zu, valid points: %d\n",sum_delta_pixels, valid_points);
 	#endif
 
-	return sum_delta_pixels;
+	return valid_points;
 }
-
 
 
 }
@@ -155,13 +156,13 @@ HWY_AFTER_NAMESPACE();
 
 namespace deltapx {
 
-	void run_hwy_calc_delta_pixels(
+	int32_t run_hwy_calc_delta_pixels(
 	  const size_t	size
   	, const int32_t* __restrict x_screen
   	, const int32_t* __restrict y_screen
   	, const CalcSettings& settings
   	, int32_t *delta_pixels )
 	{
-		HWY_STATIC_DISPATCH(hwy_calc_delta_pixels)(size, x_screen, y_screen, settings, delta_pixels );
+		return HWY_STATIC_DISPATCH(hwy_calc_delta_pixels)(size, x_screen, y_screen, settings, delta_pixels );
 	}
 }

@@ -50,4 +50,14 @@ bool calc_baseline_delta_from_nearest_refline_short_int(const int16_t x_screen, 
 
 void calc_delta_from_nearest_refline_16(const short int * __restrict x_screen, const short int * __restrict y_screen, const CalcSettingsShort& settings, int32_t *my_pixels, bool * __restrict ok);
 
+namespace deltapx {
+
+	int32_t run_hwy_calc_delta_pixels(
+	  const size_t	size
+  	, const int32_t* __restrict x_screen
+  	, const int32_t* __restrict y_screen
+  	, const CalcSettings& settings
+  	, int32_t *delta_pixels );
+}
+
 void test_hwy_calc_delta_pixels();
