@@ -19,6 +19,7 @@ set(SOURCES
     src/calc_baseline/test_highway.cpp
     /home/bee/dev/highway/hwy/print.cc
     /home/bee/dev/highway/hwy/targets.cc
+    /home/bee/dev/highway/hwy/per_target.cc
     # ../traktor/src/calculate.cpp
 )
 
