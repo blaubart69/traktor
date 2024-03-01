@@ -16,10 +16,45 @@ namespace HWY_NAMESPACE {
 namespace hn = hwy::HWY_NAMESPACE;
 
 template <class DF, class DI>
+struct VCalcSettings
+{
+	const DF df;
+	const DI di;
+
+	using VI = hn::Vec<decltype(di)>;
+	using VF = hn::Vec<decltype(df)>;
+
+    VI x_half;           	         
+    VI rowPerspectivePx; 	         
+    VF y_baseline; 		         
+    VI offset; 			         
+    VI range_baseline; 	         
+    VI refline_distance;            
+    VI       half_refline_distance ;
+    VI minus_half_refline_distance;
+
+	VCalcSettings(
+		const DF df,
+		const DI di,
+		const CalcSettings& settings)
+	{
+		x_half           	        = hn::Set(di, settings.x_half);
+		rowPerspectivePx 	        = hn::Set(di, settings.rowPerspectivePx);
+		y_baseline 		            = hn::Set(df, (float)settings.y_baseline);
+		offset 			            = hn::Set(di, settings.offset);
+		range_baseline 	            = hn::Set(di, settings.range_baseline);
+		refline_distance            = hn::Set(di, settings.refline_distance);
+              half_refline_distance = hn::Set(di, settings.half_refline_distance);
+		minus_half_refline_distance = hn::Neg(             half_refline_distance);
+	}
+};
+
+
+template <class DF, class DI>
 static int32_t ONE_delta_pixels(
 	const DF df
   , const DI di		
-  , const CalcSettings& settings
+  , const VCalcSettings<DF,DI>& settings
   ,	const int32_t * HWY_RESTRICT x_point_screen
   , const int32_t * HWY_RESTRICT y_point_screen
   , int32_t *delta_pixels
@@ -28,13 +63,13 @@ static int32_t ONE_delta_pixels(
 	//
 	// 1. project to coord
 	//
-	const auto v_x_half           = hn::Set(di, settings.x_half);
-  	const auto v_rowPerspectivePx = hn::Set(di, settings.rowPerspectivePx);
+	//const auto v_x_half           = hn::Set(di, settings.x_half);
+  	//const auto v_rowPerspectivePx = hn::Set(di, settings.rowPerspectivePx);
 
 	// x_coord[ i ] = x_point_screen[ i ] - x_half;
-	auto v_x_coord = hn::Sub( hn::Load(di, x_point_screen) , v_x_half );		
+	auto v_x_coord = hn::Sub( hn::Load(di, x_point_screen) , settings.x_half );		
 	// y_coord[ i ] = y_point_screen[ i ] + rowPerspectivePx
-	auto v_y_coord = hn::Add( hn::Load(di, y_point_screen), v_rowPerspectivePx );		
+	auto v_y_coord = hn::Add( hn::Load(di, y_point_screen), settings.rowPerspectivePx );		
 
 	//
 	// 2. project to onto baseline
@@ -42,28 +77,29 @@ static int32_t ONE_delta_pixels(
 	//		!!! so we don't have to deal with INFINITY 	!!!
 	//		hint for myself: y_fluchtpunkt > 0
 	//
-	const auto v_y_baseline = hn::Set(df, (float)settings.y_baseline);
+	//const auto v_y_baseline = hn::Set(df, (float)settings.y_baseline);
 	
 	auto v_x_coord_float = hn::ConvertTo(df, v_x_coord);
 	auto v_y_coord_float = hn::ConvertTo(df, v_y_coord);
 
 	// x_base_line[ i ] = ( y_baseline * point[ i ].x ) / point[ i ].y;
-	auto v_x_baseline_float = hn::Div( hn::Mul( v_x_coord_float, v_y_baseline), v_y_coord_float );
+	auto v_x_baseline_float = hn::Div( hn::Mul( v_x_coord_float, settings.y_baseline), v_y_coord_float );
 	auto v_x_baseline = hn::ConvertTo(di, v_x_baseline_float);
 
 	//
 	// 3. apply offset
 	//
-	const auto v_offset = hn::Set(di, settings.offset);
-	v_x_baseline = hn::Add( v_x_baseline, v_offset );
+	//const auto v_offset = hn::Set(di, settings.offset);
+	v_x_baseline = hn::Add( v_x_baseline, settings.offset );
 
 	//
 	// 4. is_within_range
 	//
-	const auto v_range_baseline = hn::Set(di, settings.range_baseline);
-	auto mask_within_range = hn::Lt( hn::Abs(v_x_baseline), v_range_baseline);
-
-	if ( hn::AllFalse(di, mask_within_range) )
+	//const auto v_range_baseline = hn::Set(di, settings.range_baseline);
+	auto mask_within_range = hn::Lt( hn::Abs(v_x_baseline), settings.range_baseline);
+	
+	auto count_valid_points = hn::CountTrue(di,mask_within_range);
+	if ( count_valid_points == 0 )
 	{
 		return 0;
 	}
@@ -73,8 +109,8 @@ static int32_t ONE_delta_pixels(
 	//	==> x_baseline % (int)refline_distance
 	//
 	// V: {u,i} \ V MaskedModOr(V no, M m, V a, V b): returns a[i] % b[i] or no[i] if m[i] is false.
-	const auto v_refline_distance = hn::Set(di, settings.refline_distance);
-	auto v_x_one_row = hn::MaskedModOr( hn::Zero(di) , mask_within_range, v_x_baseline, v_refline_distance );
+	//const auto v_refline_distance = hn::Set(di, settings.refline_distance);
+	auto v_x_one_row = hn::MaskedModOr( hn::Zero(di) , mask_within_range, v_x_baseline, settings.refline_distance );
 
 	//
 	// 6. distance_to_nearest_refline_on_baseline
@@ -83,14 +119,14 @@ static int32_t ONE_delta_pixels(
     //		if ( x_first_row <= -half_refline_distance ) return x_first_row + refline_distance;
     //		return x_first_row;
 	//
-	const auto       v_half_refline_distance = hn::Set(di, settings.half_refline_distance);
-	const auto v_minus_half_refline_distance = hn::Neg(           v_half_refline_distance);
+	//const auto       v_half_refline_distance = hn::Set(di, settings.half_refline_distance);
+	//const auto v_minus_half_refline_distance = hn::Neg(           v_half_refline_distance);
 
-	const auto mask_gt = hn::Gt(v_x_one_row, v_half_refline_distance);
-	const auto mask_lt = hn::Lt(v_x_one_row, v_minus_half_refline_distance);
+	const auto mask_gt = hn::Gt(v_x_one_row, settings.half_refline_distance);
+	const auto mask_lt = hn::Lt(v_x_one_row, settings.minus_half_refline_distance);
 
-	auto x_result_gt = hn::MaskedSubOr( hn::Zero(di), mask_gt, v_x_one_row, v_refline_distance);
-	auto x_result_lt = hn::MaskedAddOr( hn::Zero(di), mask_lt, v_x_one_row, v_refline_distance);
+	auto x_result_gt = hn::MaskedSubOr( hn::Zero(di), mask_gt, v_x_one_row, settings.refline_distance);
+	auto x_result_lt = hn::MaskedAddOr( hn::Zero(di), mask_lt, v_x_one_row, settings.refline_distance);
 
 	auto mask_rest       = hn::And( hn::Not(mask_gt), hn::Not(mask_lt) );
 	auto mask_valid_rest = hn::And( mask_rest, mask_within_range );
@@ -109,10 +145,6 @@ static int32_t ONE_delta_pixels(
 	hn::Print(di, "x_result_valid_rest", x_result_valid_rest, 	0, hn::Lanes(di));
 	printf("----\n");
 	#endif
-
-	const auto ones = hn::Set(di, 1);
-	auto valid_points = hn::IfThenElse( mask_within_range, ones, hn::Zero(di) );
-	int32_t count_valid_points = hn::ReduceSum(di, valid_points);
 
 	return count_valid_points;
 }
@@ -133,17 +165,18 @@ static int32_t hwy_calc_delta_pixels(
 	printf("lanes float  : %lu\n", hn::Lanes(df));
 	#endif
 
-	//size_t sum_delta_pixels = 0;
+	VCalcSettings vsettings(df,di,settings);
+
 	int32_t valid_points = 0;
 	for (size_t i = 0; i < size; i += N) 
 	{
 		int32_t ONE_delta_px = 0;
-		valid_points += ONE_delta_pixels(df, di, settings, x_screen + i, y_screen + i, &ONE_delta_px);
+		valid_points += ONE_delta_pixels(df, di, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
 		*delta_pixels += ONE_delta_px;
 	}
 
 	#ifdef DEBUG
-	printf("SUM delta: %zu, valid points: %d\n",sum_delta_pixels, valid_points);
+	printf("SUM delta: %zu, valid points: %d\n",delta_pixels, valid_points);
 	#endif
 
 	return valid_points;
