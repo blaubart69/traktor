@@ -35,7 +35,9 @@ target_compile_features(${PROJECT} PRIVATE cxx_std_17)
 target_compile_definitions(${PROJECT} PUBLIC "$<$<CONFIG:DEBUG>:DEBUG>")
 
 #target_compile_options(${PROJECT} PRIVATE -Wall -Wextra -Wpedantic -masm=intel -save-temps=obj -march=native)
-target_compile_options(${PROJECT} PRIVATE -mavx2 -march=native)
+target_compile_options(${PROJECT} PRIVATE -march=native -mavx2)
 # -march=native
+# -march=znver2
+# -mavx2
 
 message(STATUS "Compiler: ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_VERSION}")

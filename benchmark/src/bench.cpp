@@ -271,7 +271,7 @@ int main()
     size_t frames = 30;
     int rows = 3;
 
-    for ( int i=1; i <= 2; i++)
+    for ( int i=1; i <= 1; i++)
     {
         printf("--- %d. rows: %d, frames: %lu---\n", i, rows, frames);
         bench_classic                      ("Classic",            frames, rows);
