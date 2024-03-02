@@ -43,7 +43,7 @@ struct CalcSettingsShort
 };
 
 
-bool calc_baseline_delta_from_nearest_refline          (const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
+bool calc_baseline_delta_from_nearest_refline_kiss     (const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
 bool calc_baseline_delta_from_nearest_refline_int      (const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
 bool calc_baseline_delta_from_nearest_refline_float_mul(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
 bool calc_baseline_delta_from_nearest_refline_short_int(const int16_t x_screen, const int16_t y_screen, const CalcSettingsShort& settings, int *delta_pixels);

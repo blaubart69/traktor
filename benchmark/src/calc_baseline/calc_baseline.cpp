@@ -85,7 +85,7 @@ PRIVATE int distance_to_nearest_refline_on_baseline(const int x_first_row, const
     return x_first_row;
 }
 
-bool __attribute__ ((noinline)) calc_baseline_delta_from_nearest_refline(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels)
+bool __attribute__ ((noinline)) calc_baseline_delta_from_nearest_refline_kiss(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels)
 {
     CoordPoint p;
     p = project_screen_point_to_coord(x_screen,y_screen, settings.x_half, settings.rowPerspectivePx);
