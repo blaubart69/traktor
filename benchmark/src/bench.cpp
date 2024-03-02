@@ -212,7 +212,7 @@ void bench_highway(const char* impl_name, size_t frames, int rows)
 
     auto start = std::chrono::high_resolution_clock::now();
 
-        #define N 32
+        #define N 64
 
         int delta_pixels_sum = 0;
         size_t in_range = 0;
