@@ -168,6 +168,7 @@ static int32_t hwy_calc_delta_pixels(
 	VCalcSettings vsettings(df,di,settings);
 
 	int32_t valid_points = 0;
+	*delta_pixels = 0;
 	for (size_t i = 0; i < size; i += N) 
 	{
 		int32_t ONE_delta_px = 0;
