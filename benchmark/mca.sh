@@ -14,5 +14,5 @@ run() {
 }
 
 CPU=znver2
-run $CPU cmp/baseline_V0_clang.s 
-run $CPU cmp/baseline_V0_gcc.s
+run $CPU cmp/baseline_simple_clang.s 
+run $CPU cmp/baseline_simple_gcc.s

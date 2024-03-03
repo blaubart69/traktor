@@ -12,6 +12,7 @@ set(SOURCES
     src/calc_baseline/calc_baseline_int.cpp
     src/calc_baseline/calc_baseline_short_int.cpp
     src/calc_baseline/calc_baseline_float_mul.cpp
+    src/calc_baseline/calc_baseline_only_float.cpp
     src/calc_baseline/calc_baseline_v16.cpp
     src/calc_classic/calc_classic.h
     src/calc_classic/calc_classic.cpp
@@ -35,7 +36,7 @@ target_compile_features(${PROJECT} PRIVATE cxx_std_17)
 target_compile_definitions(${PROJECT} PUBLIC "$<$<CONFIG:DEBUG>:DEBUG>")
 
 #target_compile_options(${PROJECT} PRIVATE -Wall -Wextra -Wpedantic -masm=intel -save-temps=obj -march=native)
-target_compile_options(${PROJECT} PRIVATE -march=native -mavx2)
+target_compile_options(${PROJECT} PRIVATE -march=native -mtune=native)
 # -march=native
 # -march=znver2
 # -mavx2

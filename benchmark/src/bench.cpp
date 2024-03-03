@@ -7,7 +7,7 @@
 void print_result(const char* impl_name, std::chrono::_V2::system_clock::rep duration_ns,
     size_t points, int32_t delta_pixels_sum, size_t in_range, size_t out_range)
 {
-    printf("%20s: %11.3f ms, points: %12lu, delta_pixels_sum: %10d, in: %lu, out: %lu\n", 
+    printf("%25s: %11.3f ms, points: %12lu, delta_pixels_sum: %10d, in: %lu, out: %lu\n", 
         impl_name
         , ( (float)duration_ns / 1000000 )
         , points, delta_pixels_sum, in_range, out_range );
@@ -107,7 +107,7 @@ void bench_a_baseline(const char* impl_name, size_t frames, int rows, pfImpl bas
     tySettings calcSettings(
           screen_width / 2
         , screen_height
-        , 0     // refSettings.rowPerspectivePx
+        , 1     // refSettings.rowPerspectivePx
         , 160   // refSettings.rowSpacingPx
         , 0     // refSettings.offset
         , rows     // row_count
@@ -139,7 +139,7 @@ void bench_v16(const char* impl_name, size_t frames, int rows)
     CalcSettingsShort calcSettings(
           screen_width / 2
         , screen_height
-        , 0     // refSettings.rowPerspectivePx
+        , 1     // refSettings.rowPerspectivePx
         , 160   // refSettings.rowSpacingPx
         , 0     // refSettings.offset
         , rows     // row_count
@@ -204,7 +204,7 @@ void bench_highway(const char* impl_name, size_t frames, int rows)
     CalcSettings calcSettings(
           screen_width / 2
         , screen_height
-        , 0     // refSettings.rowPerspectivePx
+        , 1     // refSettings.rowPerspectivePx
         , 160   // refSettings.rowSpacingPx
         , 0     // refSettings.offset
         , rows     // row_count
@@ -275,10 +275,11 @@ int main()
     {
         printf("--- %d. rows: %d, frames: %lu---\n", i, rows, frames);
         bench_classic                      ("Classic",               frames, rows);
-        bench_a_baseline<CalcSettings>     ("baseline float (kiss)", frames, rows, calc_baseline_delta_from_nearest_refline_simple);
+        bench_a_baseline<CalcSettings>     ("baseline float (simple)", frames, rows, calc_baseline_delta_from_nearest_refline_simple);
         bench_a_baseline<CalcSettings>     ("baseline int (mul)",    frames, rows, calc_baseline_delta_from_nearest_refline_int);
         bench_a_baseline<CalcSettings>     ("baseline float mul",    frames, rows, calc_baseline_delta_from_nearest_refline_float_mul);
         bench_a_baseline<CalcSettingsShort>("baseline short int",    frames, rows, calc_baseline_delta_from_nearest_refline_short_int);
+        bench_a_baseline<CalcSettingsFloat>("baseline only float",   frames, rows, calc_baseline_delta_from_nearest_refline_only_float);
         bench_v16                          ("baseline v16",          frames, rows);
         bench_highway                      ("highway",               frames, rows);
     }

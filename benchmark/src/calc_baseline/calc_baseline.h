@@ -42,13 +42,33 @@ struct CalcSettingsShort
     {}
 };
 
+struct CalcSettingsFloat
+{
+    const float x_half;
+    const float rowPerspectivePx;
+    const float y_baseline;
+    const float offset;
+    const float refline_distance;
+    const float half_refline_distance;
+    const float range_baseline;
+
+    CalcSettingsFloat(float x_half, float y_screen_size, float rowPerspectivePx, float refline_distance, float offset, float row_count) 
+    :   x_half(x_half)
+    ,   rowPerspectivePx(rowPerspectivePx)
+    ,   y_baseline(rowPerspectivePx + y_screen_size)
+    ,   offset(offset)
+    ,   refline_distance(refline_distance)
+    ,   half_refline_distance(refline_distance / 2)
+    ,   range_baseline( ( refline_distance * row_count ) + (refline_distance / 2) )
+    {}
+};
 
 bool calc_baseline_delta_from_nearest_refline_simple   (const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
 bool calc_baseline_delta_from_nearest_refline_int      (const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
 bool calc_baseline_delta_from_nearest_refline_float_mul(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels);
 bool calc_baseline_delta_from_nearest_refline_short_int(const int16_t x_screen, const int16_t y_screen, const CalcSettingsShort& settings, int *delta_pixels);
-
 void calc_delta_from_nearest_refline_16(const short int * __restrict x_screen, const short int * __restrict y_screen, const CalcSettingsShort& settings, int32_t *my_pixels, bool * __restrict ok);
+bool calc_baseline_delta_from_nearest_refline_only_float(const int x_screen, const int y_screen, const CalcSettingsFloat& settings, int *delta_pixels);
 
 namespace deltapx {
 
