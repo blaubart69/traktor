@@ -282,6 +282,8 @@ int main()
         bench_v16                          ("baseline v16",          frames, rows);
         bench_highway                      ("highway",               frames, rows);
     }
+    printf("=====\n");
+    deltapx::print_target();
 
     return 0;
 }

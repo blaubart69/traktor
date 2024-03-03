@@ -58,6 +58,8 @@ namespace deltapx {
   	, const int32_t* __restrict y_screen
   	, const CalcSettings& settings
   	, int32_t *delta_pixels );
+
+    void print_target();
 }
 
 void test_hwy_calc_delta_pixels();

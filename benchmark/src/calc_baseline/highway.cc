@@ -198,4 +198,12 @@ namespace deltapx {
 	{
 		return HWY_STATIC_DISPATCH(hwy_calc_delta_pixels)(size, x_screen, y_screen, settings, delta_pixels );
 	}
+
+	void print_target()
+	{
+		for (auto t : hwy::SupportedAndGeneratedTargets())
+		{
+			printf("Highway target: %s\n",hwy::TargetName(t));
+		}
+	}
 }
