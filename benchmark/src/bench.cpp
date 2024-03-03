@@ -275,7 +275,7 @@ int main()
     {
         printf("--- %d. rows: %d, frames: %lu---\n", i, rows, frames);
         bench_classic                      ("Classic",               frames, rows);
-        bench_a_baseline<CalcSettings>     ("baseline float (kiss)", frames, rows, calc_baseline_delta_from_nearest_refline_kiss);
+        bench_a_baseline<CalcSettings>     ("baseline float (kiss)", frames, rows, calc_baseline_delta_from_nearest_refline_simple);
         bench_a_baseline<CalcSettings>     ("baseline int (mul)",    frames, rows, calc_baseline_delta_from_nearest_refline_int);
         bench_a_baseline<CalcSettings>     ("baseline float mul",    frames, rows, calc_baseline_delta_from_nearest_refline_float_mul);
         bench_a_baseline<CalcSettingsShort>("baseline short int",    frames, rows, calc_baseline_delta_from_nearest_refline_short_int);

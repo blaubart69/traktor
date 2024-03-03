@@ -12,10 +12,10 @@ run_one_build() {
     cmake -S . -B $BUILDDIR -DCMAKE_BUILD_TYPE=Release 
     ( cd $BUILDDIR &&  make -j`nproc` \
         && make src/calc_baseline/highway.s \
-        && make src/calc_baseline/calc_baseline.s \
+        && make src/calc_baseline/calc_baseline_simple.s \
         )
-    cp $BUILDDIR/CMakeFiles/bench.dir/src/calc_baseline/highway.cc.s         ./cmp/highway_$CC.s
-    cp $BUILDDIR/CMakeFiles/bench.dir/src/calc_baseline/calc_baseline.cpp.s  ./cmp/baseline_V0_$CC.s
+    cp $BUILDDIR/CMakeFiles/bench.dir/src/calc_baseline/highway.cc.s                ./cmp/highway_$CC.s
+    cp $BUILDDIR/CMakeFiles/bench.dir/src/calc_baseline/calc_baseline_simple.cpp.s  ./cmp/baseline_simple_$CC.s
     cp $BUILDDIR/bench ./cmp/bench_${CC}
 }
 
