@@ -15,8 +15,8 @@ RUN     mkdir -p    /traktor/deps/cpp-httplib   \
     &&  wget -O     /traktor/deps/cpp-httplib/httplib.h https://github.com/yhirose/cpp-httplib/raw/master/httplib.h                     \
     &&  wget -O     /traktor/deps/json/json.hpp         https://github.com/nlohmann/json/raw/develop/single_include/nlohmann/json.hpp
 
-COPY ./src              /traktor/src
-COPY ./CMakeLists.txt   /traktor/CMakeLists.txt
+COPY ./traktor/src              /traktor/src
+COPY ./traktor/CMakeLists.txt   /traktor/CMakeLists.txt
 
 WORKDIR /traktor/build
 RUN     cmake -DCMAKE_BUILD_TYPE=Release .. \

@@ -4,3 +4,5 @@ release/**
 build*/**
 test/build/**
 benchmark/cmp/**
+traktor/build/**
+traktor/deps/**

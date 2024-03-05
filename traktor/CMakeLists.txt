@@ -1,9 +1,10 @@
+cmake_minimum_required(VERSION 3.27)
 set(EXE_TRAKTOR traktor)
 #set(CMAKE_CXX_FLAGS "-march=native")
-set(CMAKE_CXX_FLAGS "-gdwarf-4")
+#set(CMAKE_CXX_FLAGS "-gdwarf-4")
 
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
+#add_compile_options(-fsanitize=address)
+#add_link_options(-fsanitize=address)
 
 project(${EXE_TRAKTOR} VERSION 1.2.0)
 
@@ -37,12 +38,12 @@ set(SOURCES
 
 add_executable(${EXE_TRAKTOR} ${SOURCES})
 
-target_compile_options(${EXE_TRAKTOR} PRIVATE -Wall -Wextra -Wpedantic -Werror)
+#target_compile_options(${EXE_TRAKTOR} PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
 target_compile_features(${EXE_TRAKTOR} PRIVATE cxx_std_14)
 
-target_include_directories(${EXE_TRAKTOR} PRIVATE "../deps/cpp-httplib")
-target_include_directories(${EXE_TRAKTOR} PRIVATE "../deps/json")
+target_include_directories(${EXE_TRAKTOR} PRIVATE "./deps/cpp-httplib")
+target_include_directories(${EXE_TRAKTOR} PRIVATE "./deps/json")
 
 #
 # libgpiod
