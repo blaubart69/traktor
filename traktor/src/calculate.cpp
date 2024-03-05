@@ -174,12 +174,21 @@ bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_row
         int deltaPx;
         if ( ! calc_delta_from_nearest_refline(plant.point.x, plant.point.y, calcSettings, &deltaPx) )
         {
-            // out of range
+            plant.within_threshold = false;
+            plant.within_row_range = false;
         }
         else 
         {
             plant.within_threshold = std::abs(deltaPx) <=   refSettings.rowThresholdPx;
-            plant.within_row_range = std::abs(deltaPx) <= ( refSettings.rowThresholdPx + refSettings.rowRangePx );
+            if ( refSettings.rowRangePx == 0)   
+            {
+                // rowRange is disabled
+                plant.within_row_range = true;
+            }
+            else
+            {
+                plant.within_row_range = std::abs(deltaPx) <= ( refSettings.rowThresholdPx + refSettings.rowRangePx );
+            }
 
             if ( ! plant.within_row_range )
             {
