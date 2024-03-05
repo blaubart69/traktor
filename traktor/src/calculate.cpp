@@ -140,6 +140,7 @@ PRIVATE bool calc_delta_from_nearest_refline(const int x_screen, const int y_scr
 
     *delta_pixels = distance_to_nearest_refline_on_baseline(x_baseline_first_row, settings.refline_distance, settings.half_refline_distance);
 
+    /*
     printf("rowPerspectivePx: %5d screen x/y: %5d/%5d coord x/y: %5d/%5d x_baseline: %5d x_offset: %5d x_first: %5d delta_px: %5d\n", 
         settings.rowPerspectivePx
         , x_screen, y_screen
@@ -148,6 +149,7 @@ PRIVATE bool calc_delta_from_nearest_refline(const int x_screen, const int y_scr
         , x_baseline_offset
         , x_baseline_first_row
         , *delta_pixels);
+        */
 
     return true;
 }
