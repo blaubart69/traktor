@@ -196,7 +196,8 @@ void bench_v16(const char* impl_name, size_t frames, int rows)
     print_result(impl_name, duration, points, delta_pixels_sum, in_range, out_range);
 }
 
-void bench_highway(const char* impl_name, size_t frames, int rows)
+template<typename T, typename pfImpl>
+void bench_highway(const char* impl_name, size_t frames, int rows, pfImpl highwayImpl)
 {
     const int screen_width = 960;
     const int screen_height = 720;
@@ -219,8 +220,8 @@ void bench_highway(const char* impl_name, size_t frames, int rows)
         size_t out_range = 0;
         size_t points = 0;
 
-        int32_t v_x[ N ] __attribute__ ((aligned (128)));
-        int32_t v_y[ N ] __attribute__ ((aligned (128)));
+        T v_x[ N ] __attribute__ ((aligned (128)));
+        T v_y[ N ] __attribute__ ((aligned (128)));
 
         uint8_t v_idx = 0;
 
@@ -241,7 +242,8 @@ void bench_highway(const char* impl_name, size_t frames, int rows)
                         v_idx = 0;
 
                         int delta_pixels;
-                        int32_t valid_px = deltapx::run_hwy_calc_delta_pixels(N, v_x, v_y, calcSettings, &delta_pixels);
+                        //int32_t valid_px = deltapx::run_hwy_calc_delta_pixels(N, v_x, v_y, calcSettings, &delta_pixels);
+                        int32_t valid_px = highwayImpl(N, v_x, v_y, calcSettings, &delta_pixels);
                         in_range  +=      valid_px;
                         out_range += (N - valid_px);
                         delta_pixels_sum += delta_pixels;
@@ -281,7 +283,8 @@ int main()
         bench_a_baseline<CalcSettingsShort>("baseline short int",    frames, rows, calc_baseline_delta_from_nearest_refline_short_int);
         bench_a_baseline<CalcSettingsFloat>("baseline only float",   frames, rows, calc_baseline_delta_from_nearest_refline_only_float);
         bench_v16                          ("baseline v16",          frames, rows);
-        bench_highway                      ("highway",               frames, rows);
+        bench_highway<int32_t>             ("highway int32",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int32);
+        bench_highway<int16_t>             ("highway int16",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int16);
     }
     printf("=====\n");
     deltapx::print_target();

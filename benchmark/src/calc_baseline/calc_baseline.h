@@ -72,10 +72,17 @@ bool calc_baseline_delta_from_nearest_refline_only_float(const int x_screen, con
 
 namespace deltapx {
 
-	int32_t run_hwy_calc_delta_pixels(
+	int32_t run_hwy_calc_delta_pixels_int32(
 	  const size_t	size
   	, const int32_t* __restrict x_screen
   	, const int32_t* __restrict y_screen
+  	, const CalcSettings& settings
+  	, int32_t *delta_pixels );
+
+    int32_t run_hwy_calc_delta_pixels_int16(
+	  const size_t	size
+  	, const int16_t* __restrict x_screen
+  	, const int16_t* __restrict y_screen
   	, const CalcSettings& settings
   	, int32_t *delta_pixels );
 
