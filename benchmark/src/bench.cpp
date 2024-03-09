@@ -131,6 +131,37 @@ void bench_a_baseline(const char* impl_name, size_t frames, int rows, pfImpl bas
     print_result(impl_name, duration, points, delta_pixels_sum, in_range, out_range);
 }
 
+template<typename tySettings, typename pfImpl>
+void bench_a_baseline_loop(const char* impl_name, size_t frames, int rows, pfImpl baselineImpl)
+{
+    const int screen_width = 960;
+    const int screen_height = 720;
+
+    tySettings calcSettings(
+          screen_width / 2
+        , screen_height
+        , 1     // refSettings.rowPerspectivePx
+        , 160   // refSettings.rowSpacingPx
+        , 0     // refSettings.offset
+        , rows     // row_count
+    );
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+        int delta_pixels_sum = 0;
+        size_t in_range = 0;
+        size_t out_range = 0;
+        size_t points = 0;
+
+        baselineImpl(frames, screen_width, screen_height, &delta_pixels_sum, &in_range, &out_range, &points, calcSettings);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>( end - start ).count();
+
+    print_result(impl_name, duration, points, delta_pixels_sum, in_range, out_range);
+}
+
+
 void bench_v16(const char* impl_name, size_t frames, int rows)
 {
     const int screen_width = 960;
@@ -285,6 +316,7 @@ int main()
         bench_v16                          ("baseline v16",          frames, rows);
         bench_highway<int32_t>             ("highway int32",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int32);
         bench_highway<int16_t>             ("highway int16",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int16);
+        bench_a_baseline_loop<CalcSettings>("baseline simple loop",  frames, rows, calc_baseline_full_loop);
     }
     printf("=====\n");
     deltapx::print_target();

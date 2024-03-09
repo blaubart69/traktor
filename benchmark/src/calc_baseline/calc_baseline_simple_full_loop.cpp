@@ -85,7 +85,7 @@ PRIVATE int distance_to_nearest_refline_on_baseline(const int x_first_row, const
     return x_first_row;
 }
 
-bool calc_baseline_delta_from_nearest_refline_simple(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels)
+PRIVATE bool internal_calc_baseline_delta_from_nearest_refline_simple(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels)
 {
     CoordPoint p;
     p = project_screen_point_to_coord(x_screen,y_screen, settings.x_half, settings.rowPerspectivePx);
@@ -108,4 +108,32 @@ bool calc_baseline_delta_from_nearest_refline_simple(const int x_screen, const i
     *delta_pixels = distance_to_nearest_refline_on_baseline(x_baseline_first_row, settings.refline_distance, settings.half_refline_distance);
 
     return true;
+}
+
+void calc_baseline_full_loop(
+    int frames,
+    int screen_width, int screen_height,
+    int *delta_pixels_sum, size_t *in_range, size_t *out_range, size_t *points, 
+    const CalcSettings& calcSettings)
+{
+    for ( size_t i=0; i < frames; i++) 
+    {
+        for ( int x=0; x<screen_width;x++) 
+        {
+            for ( int y=0; y<screen_height;y++) 
+            {
+                int delta_pixels;
+                if ( ! internal_calc_baseline_delta_from_nearest_refline_simple(x, y, calcSettings, &delta_pixels) )
+                {
+                    *out_range += 1;
+                }
+                else
+                {
+                    *in_range += 1;
+                    *delta_pixels_sum += delta_pixels;
+                }
+                *points += 1;
+            }
+        }
+    }
 }

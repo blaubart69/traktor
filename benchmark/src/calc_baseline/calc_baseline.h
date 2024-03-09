@@ -70,6 +70,13 @@ bool calc_baseline_delta_from_nearest_refline_short_int(const int16_t x_screen, 
 void calc_delta_from_nearest_refline_16(const short int * __restrict x_screen, const short int * __restrict y_screen, const CalcSettingsShort& settings, int32_t *my_pixels, bool * __restrict ok);
 bool calc_baseline_delta_from_nearest_refline_only_float(const int x_screen, const int y_screen, const CalcSettingsFloat& settings, int *delta_pixels);
 
+void calc_baseline_full_loop(
+    int frames,
+    int screen_width, int screen_height,
+    int *delta_pixels_sum, size_t *in_range, size_t *out_range, size_t *points, 
+    const CalcSettings& calcSettings);
+
+
 namespace deltapx {
 
 	int32_t run_hwy_calc_delta_pixels_int32(

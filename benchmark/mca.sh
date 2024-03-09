@@ -9,7 +9,7 @@ run() {
     filename="${filename%.*}"
 
     local OUT="cmp/mca_${filename}_${CPU}.txt"
-    llvm-mca -mcpu=$CPU -iterations=1 -timeline --timeline-max-cycles=0 --all-views $FILE > $OUT
+    llvm-mca -output-asm-variant=1 -mcpu=$CPU -iterations=1 -timeline --timeline-max-cycles=0 --all-views $FILE > $OUT
     echo "out: ${OUT}"
 }
 

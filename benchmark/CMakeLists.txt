@@ -9,6 +9,7 @@ set(SOURCES
     src/bench.cpp
     src/calc_baseline/calc_baseline.h
     src/calc_baseline/calc_baseline_simple.cpp
+    src/calc_baseline/calc_baseline_simple_full_loop.cpp
     src/calc_baseline/calc_baseline_int.cpp
     src/calc_baseline/calc_baseline_short_int.cpp
     src/calc_baseline/calc_baseline_float_mul.cpp
