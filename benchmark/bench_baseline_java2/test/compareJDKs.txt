@@ -1,0 +1,78 @@
+JDK 22
+======
+
+Result "org.sample.Bm.runSimpleOptionalImpl":
+  N = 130
+  mean =      0.077 ±(99.9%) 0.001 s/op
+
+  Histogram, s/op:
+    [0.070, 0.073) = 0 
+    [0.073, 0.075) = 0 
+    [0.075, 0.078) = 116 
+    [0.078, 0.080) = 9 
+    [0.080, 0.083) = 1 
+    [0.083, 0.085) = 1 
+    [0.085, 0.088) = 0 
+    [0.088, 0.090) = 0 
+    [0.090, 0.093) = 0 
+    [0.093, 0.095) = 1 
+    [0.095, 0.098) = 1 
+    [0.098, 0.100) = 0 
+    [0.100, 0.103) = 1 
+    [0.103, 0.105) = 0 
+    [0.105, 0.108) = 0 
+
+  Percentiles, s/op:
+      p(0.0000) =      0.076 s/op
+     p(50.0000) =      0.076 s/op
+     p(90.0000) =      0.078 s/op
+     p(95.0000) =      0.079 s/op
+     p(99.0000) =      0.101 s/op
+     p(99.9000) =      0.102 s/op
+     p(99.9900) =      0.102 s/op
+     p(99.9990) =      0.102 s/op
+     p(99.9999) =      0.102 s/op
+    p(100.0000) =      0.102 s/op
+
+
+JDK 22                                                                  |  JDK 17
+======                                                                  |  =====
+                                                                        |
+Benchmark                             Mode  Cnt  Score    Error  Units  |   Benchmark                             Mode  Cnt  Score    Error  Units    
+Bm.runBaselineCalc                  sample  156  0.064 ±  0.001   s/op  |   Bm.runBaselineCalc                  sample  166  0.060 ±  0.001   s/op
+Bm.runBaselineCalc:p0.00            sample       0.064            s/op  |   Bm.runBaselineCalc:p0.00            sample       0.060            s/op
+Bm.runBaselineCalc:p0.50            sample       0.064            s/op  |   Bm.runBaselineCalc:p0.50            sample       0.060            s/op
+Bm.runBaselineCalc:p0.90            sample       0.065            s/op  |   Bm.runBaselineCalc:p0.90            sample       0.061            s/op
+Bm.runBaselineCalc:p0.95            sample       0.065            s/op  |   Bm.runBaselineCalc:p0.95            sample       0.061            s/op
+Bm.runBaselineCalc:p0.99            sample       0.068            s/op  |   Bm.runBaselineCalc:p0.99            sample       0.066            s/op
+Bm.runBaselineCalc:p0.999           sample       0.069            s/op  |   Bm.runBaselineCalc:p0.999           sample       0.067            s/op
+Bm.runBaselineCalc:p0.9999          sample       0.069            s/op  |   Bm.runBaselineCalc:p0.9999          sample       0.067            s/op
+Bm.runBaselineCalc:p1.00            sample       0.069            s/op  |   Bm.runBaselineCalc:p1.00            sample       0.067            s/op
+Bm.runBaselineCalcFloatMul          sample  197  0.051 ±  0.001   s/op  |   Bm.runBaselineCalcFloatMul          sample  207  0.048 ±  0.001   s/op
+Bm.runBaselineCalcFloatMul:p0.00    sample       0.050            s/op  |   Bm.runBaselineCalcFloatMul:p0.00    sample       0.048            s/op
+Bm.runBaselineCalcFloatMul:p0.50    sample       0.051            s/op  |   Bm.runBaselineCalcFloatMul:p0.50    sample       0.048            s/op
+Bm.runBaselineCalcFloatMul:p0.90    sample       0.052            s/op  |   Bm.runBaselineCalcFloatMul:p0.90    sample       0.049            s/op
+Bm.runBaselineCalcFloatMul:p0.95    sample       0.053            s/op  |   Bm.runBaselineCalcFloatMul:p0.95    sample       0.049            s/op
+Bm.runBaselineCalcFloatMul:p0.99    sample       0.057            s/op  |   Bm.runBaselineCalcFloatMul:p0.99    sample       0.055            s/op
+Bm.runBaselineCalcFloatMul:p0.999   sample       0.060            s/op  |   Bm.runBaselineCalcFloatMul:p0.999   sample       0.058            s/op
+Bm.runBaselineCalcFloatMul:p0.9999  sample       0.060            s/op  |   Bm.runBaselineCalcFloatMul:p0.9999  sample       0.058            s/op
+Bm.runBaselineCalcFloatMul:p1.00    sample       0.060            s/op  |   Bm.runBaselineCalcFloatMul:p1.00    sample       0.058            s/op
+Bm.runSimpleImpl                    sample  154  0.065 ±  0.001   s/op  |   Bm.runSimpleImpl                    sample  168  0.060 ±  0.001   s/op
+Bm.runSimpleImpl:p0.00              sample       0.064            s/op  |   Bm.runSimpleImpl:p0.00              sample       0.059            s/op
+Bm.runSimpleImpl:p0.50              sample       0.064            s/op  |   Bm.runSimpleImpl:p0.50              sample       0.060            s/op
+Bm.runSimpleImpl:p0.90              sample       0.067            s/op  |   Bm.runSimpleImpl:p0.90              sample       0.060            s/op
+Bm.runSimpleImpl:p0.95              sample       0.069            s/op  |   Bm.runSimpleImpl:p0.95              sample       0.060            s/op
+Bm.runSimpleImpl:p0.99              sample       0.078            s/op  |   Bm.runSimpleImpl:p0.99              sample       0.064            s/op
+Bm.runSimpleImpl:p0.999             sample       0.084            s/op  |   Bm.runSimpleImpl:p0.999             sample       0.064            s/op
+Bm.runSimpleImpl:p0.9999            sample       0.084            s/op  |   Bm.runSimpleImpl:p0.9999            sample       0.064            s/op
+Bm.runSimpleImpl:p1.00              sample       0.084            s/op  |   Bm.runSimpleImpl:p1.00              sample       0.064            s/op
+Bm.runSimpleOptionalImpl            sample  130  0.077 ±  0.001   s/op  |   Bm.runSimpleOptionalImpl            sample  105  0.096 ±  0.001   s/op
+Bm.runSimpleOptionalImpl:p0.00      sample       0.076            s/op  |   Bm.runSimpleOptionalImpl:p0.00      sample       0.095            s/op
+Bm.runSimpleOptionalImpl:p0.50      sample       0.076            s/op  |   Bm.runSimpleOptionalImpl:p0.50      sample       0.096            s/op
+Bm.runSimpleOptionalImpl:p0.90      sample       0.078            s/op  |   Bm.runSimpleOptionalImpl:p0.90      sample       0.096            s/op
+Bm.runSimpleOptionalImpl:p0.95      sample       0.079            s/op  |   Bm.runSimpleOptionalImpl:p0.95      sample       0.097            s/op
+Bm.runSimpleOptionalImpl:p0.99      sample       0.101            s/op  |   Bm.runSimpleOptionalImpl:p0.99      sample       0.099            s/op
+Bm.runSimpleOptionalImpl:p0.999     sample       0.102            s/op  |   Bm.runSimpleOptionalImpl:p0.999     sample       0.099            s/op
+Bm.runSimpleOptionalImpl:p0.9999    sample       0.102            s/op  |   Bm.runSimpleOptionalImpl:p0.9999    sample       0.099            s/op
+Bm.runSimpleOptionalImpl:p1.00      sample       0.102            s/op  |   Bm.runSimpleOptionalImpl:p1.00      sample       0.099            s/op
+
