@@ -206,9 +206,8 @@ bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_row
     }
     if ( plants_processed > 0 ) {
         *avg_deltaPx = sum_deltaPx / plants_processed;
+        //printf("calc_average_delta: plants_processed: %d, sum_deltaPx: %d avg_deltaPx: %d\n", plants_processed, sum_deltaPx, *avg_deltaPx);
     }
-
-    printf("calc_average_delta: plants_processed: %d, sum_deltaPx: %d avg_deltaPx: %d\n", plants_processed, sum_deltaPx, *avg_deltaPx);
 
     return plants_processed > 0;
 }

@@ -38,6 +38,7 @@ set(SOURCES
 
 add_executable(${EXE_TRAKTOR} ${SOURCES})
 
+target_compile_options(${EXE_TRAKTOR} PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
 #target_compile_options(${EXE_TRAKTOR} PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
 target_compile_features(${EXE_TRAKTOR} PRIVATE cxx_std_14)
