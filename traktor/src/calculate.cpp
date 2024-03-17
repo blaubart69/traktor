@@ -165,8 +165,8 @@ bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_row
         , refSettings.get_half_row_count()
     );
 
-    int  sum_deltaPx = 0;
-    uint plants_processed = 0;
+    int sum_deltaPx = 0;
+    int plants_processed = 0;
 
     for ( std::size_t i=0; i < contoures->centers.size(); ++i )
     {
@@ -207,6 +207,8 @@ bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_row
     if ( plants_processed > 0 ) {
         *avg_deltaPx = sum_deltaPx / plants_processed;
     }
+
+    printf("calc_average_delta: plants_processed: %d, sum_deltaPx: %d avg_deltaPx: %d\n", plants_processed, sum_deltaPx, *avg_deltaPx);
 
     return plants_processed > 0;
 }

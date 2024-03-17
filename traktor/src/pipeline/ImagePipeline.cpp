@@ -4,8 +4,6 @@
 void ImagePipeline::camera_1(std::function<void(Workitem*,CameraContext*)> process, CameraContext* context) {
 //-----------------------------------------------------------------------------
 
-    puts("starting camera loop");
-
     for ( ;; ) {
 
         // --- read ---
@@ -34,8 +32,6 @@ void ImagePipeline::camera_1(std::function<void(Workitem*,CameraContext*)> proce
 void ImagePipeline::detect_2(std::function<void(Workitem*,DetectContext*)> process, DetectContext* context) {
 //-----------------------------------------------------------------------------
     
-    puts("starting detect loop");
-
     for (;;) {
 
         int32_t idx;
@@ -57,8 +53,6 @@ void ImagePipeline::detect_2(std::function<void(Workitem*,DetectContext*)> proce
 //-----------------------------------------------------------------------------
 void ImagePipeline::encode_3(std::function<WORKER_RC(Workitem*,EncodeContext*)> process, EncodeContext* context) {
 //-----------------------------------------------------------------------------
-
-    puts("starting encode loop");
 
     for (;;)
     {
