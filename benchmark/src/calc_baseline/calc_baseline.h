@@ -86,6 +86,13 @@ namespace deltapx {
   	, const CalcSettings& settings
   	, int32_t *delta_pixels );
 
+    int32_t run_hwy_calc_delta_pixels_int32_only(
+	  const size_t	size
+  	, const int32_t* __restrict x_screen
+  	, const int32_t* __restrict y_screen
+  	, const CalcSettings& settings
+  	, int32_t *delta_pixels );
+
     int32_t run_hwy_calc_delta_pixels_int16(
 	  const size_t	size
   	, const int16_t* __restrict x_screen

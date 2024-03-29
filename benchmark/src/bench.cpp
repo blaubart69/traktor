@@ -316,7 +316,9 @@ int main()
         bench_a_baseline<CalcSettingsFloat>("baseline only float",   frames, rows, calc_baseline_delta_from_nearest_refline_only_float);
         bench_v16                          ("baseline v16",          frames, rows);
         bench_highway<int32_t>             ("highway int32",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int32);
+        bench_highway<int32_t>             ("highway int32 only",    frames, rows, deltapx::run_hwy_calc_delta_pixels_int32_only);
         bench_highway<int16_t>             ("highway int16",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int16);
+        
         bench_a_baseline_loop<CalcSettings>("baseline simple loop",  frames, rows, calc_baseline_full_loop);
     }
     printf("=====\n");
