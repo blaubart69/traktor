@@ -527,8 +527,8 @@ static int32_t ONE_delta_pixels_int16_fdiv(
 	using VW = hn::Vec<decltype(dw)>;
 	using VI = hn::Vec<decltype(di)>;
 
-	VW point_y_even = hn::ConvertTo(df, hn::PromoteEvenTo(dw, v_y_coord ) );
-	VW point_y_odd  = hn::ConvertTo(df, hn::PromoteOddTo (dw, v_y_coord ) );
+	auto point_y_even = hn::ConvertTo(df, hn::PromoteEvenTo(dw, v_y_coord ) );
+	auto point_y_odd  = hn::ConvertTo(df, hn::PromoteOddTo (dw, v_y_coord ) );
 
 	auto x_baseline_even = hn::ConvertTo(dw, hn::Div( mul_even, point_y_even ) );
 	auto x_baseline_odd  = hn::ConvertTo(dw, hn::Div( mul_odd,  point_y_odd  ) );
@@ -612,6 +612,7 @@ static int32_t hwy_calc_delta_pixels_int16_fdiv(
 {
 	const hn::ScalableTag<int16_t> di;
 	const hn::ScalableTag<int32_t> di32;
+	const hn::ScalableTag<float> df;
   	const size_t N = hn::Lanes(di);
 
 	#ifdef DEBUG
@@ -625,7 +626,7 @@ static int32_t hwy_calc_delta_pixels_int16_fdiv(
 	for (size_t i = 0; i < size; i += N) 
 	{
 		int32_t ONE_delta_px = 0;
-		valid_points += ONE_delta_pixels_int16(di, di32, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
+		valid_points += ONE_delta_pixels_int16_fdiv(di, di32, df, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
 		*delta_pixels += ONE_delta_px;
 	}
 
