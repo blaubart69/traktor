@@ -97,3 +97,7 @@ namespace deltapx {
 }
 
 void test_hwy_calc_delta_pixels();
+
+namespace play {
+    void run();
+}

@@ -1,0 +1,1 @@
+mvn verify && java -jar target/benchmarks.jar -f 1

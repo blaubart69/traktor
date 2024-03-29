@@ -49,6 +49,39 @@ struct VCalcSettings
 	}
 };
 
+template <class DI>
+struct ViCalcSettings
+{
+	const DI di;
+	const hn::RepartitionToWide<decltype(di)> dw;
+
+	using VI = hn::Vec<decltype(di)>;
+	using VW = hn::Vec<decltype(dw)>;
+
+    VI x_half;           	         
+    VI rowPerspectivePx; 	         
+    VI y_baseline; 		         
+    VW offset; 			         
+    VW range_baseline; 	         
+    VI refline_distance;            
+    VI       half_refline_distance;
+    VI minus_half_refline_distance;
+
+	ViCalcSettings(
+		const DI di,
+		const CalcSettings& settings)
+	{
+		x_half           	        = hn::Set(di, settings.x_half);
+		rowPerspectivePx 	        = hn::Set(di, settings.rowPerspectivePx);
+		y_baseline 		            = hn::Set(di, settings.y_baseline);
+		offset 			            = hn::Set(dw, settings.offset);
+		range_baseline 	            = hn::Set(dw, settings.range_baseline);
+		refline_distance            = hn::Set(di, settings.refline_distance);
+              half_refline_distance = hn::Set(di, settings.half_refline_distance);
+		minus_half_refline_distance = hn::Neg(             half_refline_distance);
+	}
+};
+
 
 template <class DF, class DI>
 static int32_t ONE_delta_pixels_int32(
@@ -183,12 +216,11 @@ static int32_t hwy_calc_delta_pixels_int32(
 	return valid_points;
 }
 
-template <class DF, class DI, class DI32>
+template <class DI, class DW>
 static int32_t ONE_delta_pixels_int16(
-	const DF df
-  , const DI di
-  , const DI32 di32		
-  , const VCalcSettings<DF,DI>& settings
+    const DI di
+  , const DW dw	
+  , const ViCalcSettings<DI>& settings
   ,	const int16_t * HWY_RESTRICT x_point_screen
   , const int16_t * HWY_RESTRICT y_point_screen
   , int32_t *delta_pixels
@@ -197,7 +229,7 @@ static int32_t ONE_delta_pixels_int16(
 	//
 	// 1. project to coord
 	//
-	auto v_x_coord = hn::Sub( hn::Load(di, x_point_screen) , settings.x_half );		
+	auto v_x_coord = hn::Sub( hn::Load(di, x_point_screen), settings.x_half );		
 	auto v_y_coord = hn::Add( hn::Load(di, y_point_screen), settings.rowPerspectivePx );		
 
 	//
@@ -206,42 +238,47 @@ static int32_t ONE_delta_pixels_int16(
 	//		!!! so we don't have to deal with INFINITY 	!!!
 	//		hint for myself: y_fluchtpunkt > 0
 	//
-	auto v_x_coord_i32Lo = hn::PromoteLowerTo(di32, v_x_coord);
-	auto v_y_coord_i32Lo = hn::PromoteLowerTo(di32, v_y_coord);
-	auto v_x_coord_i32Up = hn::PromoteUpperTo(di32, v_x_coord);
-	auto v_y_coord_i32Up = hn::PromoteUpperTo(di32, v_y_coord);
+	// --> *x_base_line = ( y_baseline * point.x ) / point.y;
 
-	auto v_x_coord_floatLo = hn::ConvertTo(df, v_x_coord_i32Lo);
-	auto v_y_coord_floatLo = hn::ConvertTo(df, v_y_coord_i32Lo);
-	auto v_x_coord_floatUp = hn::ConvertTo(df, v_x_coord_i32Up);
-	auto v_y_coord_floatUp = hn::ConvertTo(df, v_y_coord_i32Up);
+	auto mul_even = hn::MulEven( settings.y_baseline , v_x_coord );
+	auto mul_odd  = hn::MulOdd ( settings.y_baseline , v_x_coord );
 
-	// x_base_line[ i ] = ( y_baseline * point[ i ].x ) / point[ i ].y;
-	auto v_x_baseline_floatLo = hn::Div( hn::Mul( v_x_coord_floatLo, settings.y_baseline), v_y_coord_floatLo );
-	auto v_x_baseline_floatUp = hn::Div( hn::Mul( v_x_coord_floatUp, settings.y_baseline), v_y_coord_floatUp );
+	using VW = hn::Vec<decltype(dw)>;
+	using VI = hn::Vec<decltype(di)>;
 
-	auto v_x_baselineLoI32 = hn::ConvertTo(di32, v_x_baseline_floatLo);
-	auto v_x_baselineUpI32 = hn::ConvertTo(di32, v_x_baseline_floatUp);
+	VW point_y_even = hn::PromoteEvenTo(dw, v_y_coord );
+	VW point_y_odd  = hn::PromoteOddTo (dw, v_y_coord );
 
-   //Rebind<MakeNarrow<T>, D> 
-	//const hn::Rebind< hwy::MakeNarrow<DI32> , DI> dx;
-	const hn::Half< hn::RepartitionToNarrow<DI32> > dx;
+	auto x_baseline_even = hn::Div( mul_even, point_y_even );
+	auto x_baseline_odd  = hn::Div( mul_odd,  point_y_odd );
 
-	auto v_x_baselineLo = hn::DemoteTo(dx, v_x_baselineLoI32);
-	auto v_x_baselineUp = hn::DemoteTo(dx, v_x_baselineUpI32);
-
-	auto v_x_baseline = hn::Combine(di, v_x_baselineUp, v_x_baselineLo);
 	//
 	// 3. apply offset
 	//
 	//const auto v_offset = hn::Set(di, settings.offset);
-	v_x_baseline = hn::Add( v_x_baseline, settings.offset );
+	//v_x_baseline = hn::Add( v_x_baseline, settings.offset );
+	x_baseline_even = hn::Add( x_baseline_even, settings.offset );
+	x_baseline_odd  = hn::Add( x_baseline_odd,  settings.offset );
 
 	//
 	// 4. is_within_range
 	//
 	//const auto v_range_baseline = hn::Set(di, settings.range_baseline);
-	auto mask_within_range = hn::Lt( hn::Abs(v_x_baseline), settings.range_baseline);
+	auto mask_within_range_even = hn::Lt( hn::Abs(x_baseline_even), settings.range_baseline);
+	auto mask_within_range_odd  = hn::Lt( hn::Abs(x_baseline_odd ), settings.range_baseline);
+
+	const hn::Half< hn::RepartitionToNarrow<DW> > dwh;
+
+	VI v_x_baseline = 
+		hn::Combine(di, 
+			hn::DemoteTo(dwh, x_baseline_even)
+		  , hn::DemoteTo(dwh, x_baseline_odd) );
+		  
+	auto mask_within_range = 
+		hn::CombineMasks(di, 
+			  hn::DemoteMaskTo(dwh, dw, mask_within_range_even)
+			, hn::DemoteMaskTo(dwh, dw, mask_within_range_odd));
+
 	
 	auto count_valid_points = hn::CountTrue(di,mask_within_range);
 	if ( count_valid_points == 0 )
@@ -292,26 +329,22 @@ static int32_t hwy_calc_delta_pixels_int16(
   	, const CalcSettings& settings
   	, int32_t *delta_pixels )
 {
-	const hn::ScalableTag<float>   df;
 	const hn::ScalableTag<int16_t> di;
 	const hn::ScalableTag<int32_t> di32;
   	const size_t N = hn::Lanes(di);
 
 	#ifdef DEBUG
-	printf("lanes int32_t: %lu\n", hn::Lanes(di32));
 	printf("lanes int16_t: %lu\n", hn::Lanes(di));
-	printf("lanes float  : %lu\n", hn::Lanes(df));
-
 	#endif
 
-	VCalcSettings vsettings(df,di,settings);
+	ViCalcSettings vsettings(di,settings);
 
 	int32_t valid_points = 0;
 	*delta_pixels = 0;
 	for (size_t i = 0; i < size; i += N) 
 	{
 		int32_t ONE_delta_px = 0;
-		valid_points += ONE_delta_pixels_int16(df, di, di32, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
+		valid_points += ONE_delta_pixels_int16(di, di32, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
 		*delta_pixels += ONE_delta_px;
 	}
 
