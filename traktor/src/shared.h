@@ -127,6 +127,10 @@ struct DetectSettings {
             reflineSettings.offset += delta;
         }
 
+        void set_offset_zero() {
+            reflineSettings.offset = 0;
+        }
+
         void set_frame(const int newCols, const int newRows) {
             
             imageSettings.frame_cols = newCols;

@@ -89,7 +89,12 @@ void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
         {
             nlohmann::json data = nlohmann::json::parse(req.body);
             int offset_delta = data.value<int>("offset", 0);
-            detect_settings->add_offset_delta(offset_delta);
+            if ( offset_delta == 0 ) {
+                detect_settings->set_offset_zero();
+            }
+            else {
+                detect_settings->add_offset_delta(offset_delta);
+            }
             printf("I: offset is now: %d\n", detect_settings->getReflineSettings().offset);
             res.status = 200;
         }

@@ -113,6 +113,10 @@ angular.module('tractor', ['ui.bootstrap', 'rzSlider'])
     this.btn_offset_right = function() {
         $http.post('/offset', { "offset" :  1 }).then(handleResponse);
     };
+    this.btn_offset_reset = function() {
+        $http.post('/offset', { "offset" :  0 }).then(handleResponse);
+    };
+
     loadSettingsFromBackend('current');
     list();
     console.log("controller initialized");
