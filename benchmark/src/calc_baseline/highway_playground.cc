@@ -16,6 +16,7 @@ void run()
     const hn::ScalableTag<float>   df;
     const hn::ScalableTag<int16_t> di16;
 	const hn::ScalableTag<int32_t> di32;
+    const hn::ScalableTag<hwy::bfloat16_t> bf16;
     const hn::RepartitionToWide<decltype(di16)> diw;
 
 	printf("lanes float  : %lu\n", hn::Lanes(df));
@@ -41,6 +42,7 @@ void run()
     const auto vy = hn::Load(di16, &y[0] );
 
     auto xDy = hn::Div(vx,vy);
+
 
     hn::Print(di16, "x          ", vx, 0, hn::Lanes(di16));
     hn::Print(di16, "y          ", vy, 0, hn::Lanes(di16));

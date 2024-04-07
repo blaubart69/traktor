@@ -532,7 +532,7 @@ static int32_t ONE_delta_pixels_int16_fdiv(
 
 	auto x_baseline_even = hn::ConvertTo(dw, hn::Div( mul_even, point_y_even ) );
 	auto x_baseline_odd  = hn::ConvertTo(dw, hn::Div( mul_odd,  point_y_odd  ) );
-
+	
 	//
 	// 3. apply offset
 	//

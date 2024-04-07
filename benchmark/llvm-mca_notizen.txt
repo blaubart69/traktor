@@ -1,0 +1,7 @@
+for compiler explorer to use for llvm mca with ARM CPUs.
+
+-timeline -mtriple=aarch64 -mcpu=cortex-a72 --timeline-max-cycles=0 -iterations=1
+
+list cpu for aarch64:
+
+llvm-mca -mtriple=aarch64 -mcpu=help cmp/highway_clang.s
