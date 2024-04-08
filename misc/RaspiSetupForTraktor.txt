@@ -1,0 +1,18 @@
+WiFi AccessPoint
+================
+
+    Since Raspian OS 12 (Bookworm) with Network Manager:
+
+    + https://raspberrytips.com/access-point-setup-raspberry-pi/#setting-up-an-access-point-on-raspberry-pi-os-bookworm
+
+    1, sudo nmcli con add con-name hotspot ifname wlan0 type wifi ssid "traktor"
+    2, sudo nmcli con modify hotspot 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
+    3, sudo nmcli con modify hotspot ipv4.addresses 10.1.1.1/24 ipv4.method shared
+
+systemd service
+===============
+
+    1, sudo cp traktor.service /etc/systemd/system
+    2, sudo systemctl enable traktor.service 
+
+
