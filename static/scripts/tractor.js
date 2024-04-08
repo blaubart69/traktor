@@ -117,7 +117,8 @@ angular.module('tractor', ['ui.bootstrap', 'rzSlider'])
         $http.post('/offset', { "offset" :  0 }).then(handleResponse);
     };
 
-    loadSettingsFromBackend('current');
+    //loadSettingsFromBackend('current');
+    loadSettingsFromBackend('lastSettings.json');
     list();
     console.log("controller initialized");
 });
