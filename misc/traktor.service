@@ -1,13 +1,13 @@
 [Unit]
-Description=The Duenger server
+Description=The Traktor server
 After=multi-user.target
 
 [Service]
 User=pi
 Group=pi
 Type=idle
-WorkingDirectory=/home/pi/traktor/build
-ExecStart=/home/pi/traktor/build/traktor --width=960 --height=720
+WorkingDirectory = /home/pi/dev/traktor/traktor/build
+ExecStart        = /home/pi/dev/traktor/traktor/build/traktor --width=960 --height=720
 #StandardOutput=journal
 #StandardError=journal
 
