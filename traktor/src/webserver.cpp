@@ -157,14 +157,16 @@ void URL_current(httplib::Server* svr, DetectSettings* settings)
     });
 }
 
-void URL_stats(httplib::Server* svr, const Stats* diff)
+void URL_stats(httplib::Server* svr, const Stats* diff, const ImageSettings* imageSettings)
 {
     svr->Get("/stats", [=](__attribute__((unused)) const Request &req, Response &res) {
 
         using namespace std::chrono;
 
         nlohmann::json data;
-        data["camera"]["fps"] = diff->camera.frames / Stats::pause.count();
+        data["camera"]["fps"]    = diff->camera.frames / Stats::pause.count();
+        data["camera"]["width"]  = imageSettings->frame_cols;
+        data["camera"]["height"] = imageSettings->frame_rows;
 
         const auto overall_ms = duration_cast<milliseconds>(diff->detect.overall).count();
         data["detect"]["time_milliseconds"]["0_overall"]      = overall_ms;
@@ -211,7 +213,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCo
     URL_video(&svr, shared, pipeline, encoder_stats);
     URL_applyChanges(&svr, &shared->detectSettings );
     URL_current(&svr, &shared->detectSettings);
-    URL_stats(&svr, stats_diff);
+    URL_stats(&svr, stats_diff, &(shared->detectSettings.getImageSettings()) );
     URL_offset(&svr, &shared->detectSettings);
     //
     // ------------------------------------------------------------------------
