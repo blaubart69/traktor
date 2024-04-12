@@ -299,8 +299,8 @@ int main()
 {
 
     //test_hwy_calc_delta_pixels();
-    //play::run();
-    //return 0;
+    play::run();
+    return 0;
 
     size_t frames = 30;
     int rows = 3;
