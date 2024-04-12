@@ -30,6 +30,7 @@ bool try_open_capture(cv::VideoCapture* capture, const Options* options)
     if ( options->filename.empty() ) {
         printf("I: opening camera #%d...\n", options->cameraIndex);
         if ( capture->open(options->cameraIndex) ) {
+	    capture->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
             capture->set(cv::CAP_PROP_FRAME_WIDTH,  (double)options->camera_width);
             capture->set(cv::CAP_PROP_FRAME_HEIGHT, (double)options->camera_height);
             printf("I: set CAP_PROP_FRAME_WIDTH x CAP_PROP_FRAME_HEIGHT = %dx%d\n", options->camera_width, options->camera_height);
