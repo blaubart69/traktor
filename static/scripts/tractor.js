@@ -17,6 +17,8 @@ angular.module('tractor', ['ui.bootstrap', 'rzSlider'])
     $scope.rowSpacingPxSlider   = { value: 160, options: { floor: 10, ceil: 1000, onChange: function(s, m, h, p) { applyChanges(); } } };
     $scope.rowPerspectiveSlider = { value: 200, options: { floor:  0, ceil:  300, onChange: function(s, m, h, p) { applyChanges(); } } };
     $scope.rowRangePxSlider     = { value:   5, options: { floor:  0, ceil:  320, onChange: function(s, m, h, p) { applyChanges(); } } };
+
+    $scope.OffsetPxSlider       = { minValue:  -200, maxValue: 200, value:   0, options: { floor:  -100, ceil:  100, onChange: function(s, m, h, p) { applyChanges(); } } };
     
     $scope.showMenu = true;
     $scope.settings = [];
@@ -47,12 +49,24 @@ angular.module('tractor', ['ui.bootstrap', 'rzSlider'])
         $scope.data.rowSpacingPx       = $scope.rowSpacingPxSlider.value;
         $scope.data.rowPerspectivePx   = $scope.rowPerspectiveSlider.value;
         $scope.data.rowRangePx         = $scope.rowRangePxSlider.value;
-    };
-    const applyChanges = function () {
-        // row threshold maximum can only be the half of the row distance
-        $scope.rowThresholdPxSlider.options.ceil = Math.floor($scope.rowSpacingPxSlider.value / 2);
-        $scope.rowRangePxSlider.options.ceil     = Math.floor($scope.rowSpacingPxSlider.value / 2) - $scope.rowThresholdPxSlider.value;
 
+        $scope.data.offsetPx           = $scope.OffsetPxSlider.value;
+    };
+
+    const setDynamicSliderRanges = function() {
+        // row threshold maximum can only be the half of the row distance
+        let halfRowWidth = Math.floor($scope.rowSpacingPxSlider.value / 2);
+
+        $scope.rowThresholdPxSlider.options.ceil = halfRowWidth
+        $scope.rowRangePxSlider.options.ceil     = halfRowWidth - $scope.rowThresholdPxSlider.value;
+
+        $scope.OffsetPxSlider.options.floor      = -halfRowWidth;
+        $scope.OffsetPxSlider.options.ceil       = +halfRowWidth;
+    }
+
+    const applyChanges = function () {
+
+        setDynamicSliderRanges();        
         applySliderValues();
 
         $http.post('/applyChanges', $scope.data).then(handleResponse);
@@ -77,8 +91,9 @@ angular.module('tractor', ['ui.bootstrap', 'rzSlider'])
         $scope.rowThresholdPxSlider.value      = data.rowThresholdPx;
         $scope.rowRangePxSlider.value          = data.rowRangePx;
 
-        $scope.rowThresholdPxSlider.options.ceil = Math.floor($scope.rowSpacingPxSlider.value / 2);
-        $scope.rowRangePxSlider.options.ceil     = Math.floor($scope.rowSpacingPxSlider.value / 2) - $scope.rowThresholdPxSlider.value;
+        $scope.OffsetPxSlider.value            = data.offsetPx;
+
+        setDynamicSliderRanges();
 
     }
     const loadSettingsFromBackend = function(path) {
@@ -94,6 +109,8 @@ angular.module('tractor', ['ui.bootstrap', 'rzSlider'])
             $scope.settings.splice(index, 1);
         });
     };
+
+
     this.displayMenu = function() {
         $scope.showMenu = !$scope.showMenu;
     };
@@ -107,15 +124,28 @@ angular.module('tractor', ['ui.bootstrap', 'rzSlider'])
         loadSettingsFromBackend(path).then(applyChanges);
         $scope.settingsName = path;
     };
+    
+    this.btn_offset_setzero = function() {
+        $scope.OffsetPxSlider.value = 0;
+        applyChanges();
+    };
+    this.btn_offset_delta = function(delta) {
+        $scope.OffsetPxSlider.value = $scope.OffsetPxSlider.value + delta;
+        applyChanges();
+    }
+
+    /*
+    const applyOffset = function() {
+        $http.post('/offset/set', { "offset" : $scope.OffsetPxSlider.value }).then(handleResponse);
+    };
+
     this.btn_offset_left = function() {
         $http.post('/offset', { "offset" : -1 }).then(handleResponse);
     };
     this.btn_offset_right = function() {
         $http.post('/offset', { "offset" :  1 }).then(handleResponse);
     };
-    this.btn_offset_reset = function() {
-        $http.post('/offset', { "offset" :  0 }).then(handleResponse);
-    };
+    */
 
     //loadSettingsFromBackend('current');
     loadSettingsFromBackend('lastSettings.json');

@@ -25,4 +25,5 @@ void DetectSettings::set_fromJson(const std::string& jsonString)
     this->set_minimalContourArea( data["minimalContourArea"] .get<int>() );
 
     this->set_rowRangePx        ( data.value<int>("rowRangePx", 0) ) ;
+    this->set_offset            ( data.value<int>("offsetPx",   0) ) ;
 }

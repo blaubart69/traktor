@@ -50,6 +50,13 @@
       height: 100vh;
       overflow: auto;
     }
+    .custom-btn-big {
+      font-size: 64px;  
+      text-align: center;
+      margin: 0 auto;
+      display: block;
+    }
+
   </style>
   <script src="scripts/angular.min.js"></script>
   <script src="scripts/rzslider.min.js"></script>
@@ -78,32 +85,56 @@
         <div class="traktor-container"><img class="traktor-image" src="/video"></div>
        
           <!--<div class="col-sm-offset-1 col-sm-2">-->
-          <div class="col-sm-offset-1 col-sm-2">
-            <button type="button" id="btn_offset_left" data-ng-click="ctrl.btn_offset_left()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-              </svg>
+            <!--
+          <div class="col-sm-1">
+            <button class="custom-btn-big" type="button" data-ng-click="ctrl.btn_offset_delta(-10)">
+              -10
             </button>
+          </div>
+          <div class="col-sm-1">
+            <button class="custom-btn-big" type="button" data-ng-click="ctrl.btn_offset_delta(-1)">
+              -1
+            </button>
+          </div>
+          <div class="col-sm-1">
+            <button class="custom-btn-big" type="button" data-ng-click="ctrl.btn_offset_setzero()">
+              0
+            </button>
+          </div>
+          <div class="col-sm-1">
+            <button class="custom-btn-big" type="button" data-ng-click="ctrl.btn_offset_delta(+1)">
+              +1
+            </button>
+          </div>
+          <div class="col-sm-1">
+            <button class="custom-btn-big" type="button" data-ng-click="ctrl.btn_offset_delta(+10)">
+              +10
+            </button>
+          </div>
+          -->
+          <div class="col-sm-12">
+            <rzslider class="custom-slider" rz-slider-model="OffsetPxSlider.value"
+                      rz-slider-options="OffsetPxSlider.options"></rzslider>
+            </td>
+          </div>
+          <div class="row" style="margin-top: 5em;">
+            <div class="col-sm-4">
+              <button class="custom-btn-big" type="button" data-ng-click="ctrl.btn_offset_delta(-1)">
+                -1
+              </button>
+            </div>
+            <div class="col-sm-4">
+              <button class="custom-btn-big" type="button" data-ng-click="ctrl.btn_offset_setzero()">
+                0
+              </button>
+            </div>
+            <div class="col-sm-4">
+              <button class="custom-btn-big" type="button" data-ng-click="ctrl.btn_offset_delta(+1)">
+                +1
+              </button>
+            </div>
           </div>
 
-          <div class="col-sm-offset-1 col-sm-2">
-            <button type="button" id="btn_offset_reset" data-ng-click="ctrl.btn_offset_reset()">
-              <svg width="128" height="128" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
-                <g fill="none" fill-rule="evenodd" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="matrix(0 1 1 0 2.5 2.5)">
-                <path d="m3.98652376 1.07807068c-2.38377179 1.38514556-3.98652376 3.96636605-3.98652376 6.92192932 0 4.418278 3.581722 8 8 8s8-3.581722 8-8-3.581722-8-8-8"/>
-                <path d="m4 1v4h-4" transform="matrix(1 0 0 -1 0 6)"/>
-                </g>
-                </svg>
-            </button>
-          </div>
-
-          <div class="col-sm-offset-1 col-sm-2">
-            <button type="button" id="btn_offset_right" data-ng-click="ctrl.btn_offset_right()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-              </svg>
-            </button>
-          </div>
     </div>
       <div class="col-sm-5 b-r" data-ng-show="showMenu">
         <form name="tractorForm" method="post">
