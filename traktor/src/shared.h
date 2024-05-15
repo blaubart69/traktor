@@ -68,6 +68,7 @@ struct ReflinesSettings {
         int         x_half;
         int         y_fluchtpunkt;
         int         offset;
+        int         offset_last;
 
         int get_half_row_count() const {
             if ( rowMax == 0) {
@@ -128,7 +129,16 @@ struct DetectSettings {
         }
 
         void set_offset_zero() {
+            reflineSettings.offset_last = reflineSettings.offset;
             reflineSettings.offset = 0;
+        }
+
+        void set_offset(int newvalue) {
+            reflineSettings.offset = newvalue;
+        }
+
+        void mirror_offset() {
+            reflineSettings.offset = -reflineSettings.offset;
         }
 
         void set_frame(const int newCols, const int newRows) {

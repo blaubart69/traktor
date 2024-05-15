@@ -83,19 +83,57 @@ void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, En
 
 void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
 {
-    svr->Post("/offset", [=](const Request &req, Response &res)
+    svr->Post("/offset/delta", [=](const Request &req, Response &res)
     {
         try
         {
             nlohmann::json data = nlohmann::json::parse(req.body);
-            int offset_delta = data.value<int>("offset", 0);
-            if ( offset_delta == 0 ) {
-                detect_settings->set_offset_zero();
-            }
-            else {
-                detect_settings->add_offset_delta(offset_delta);
-            }
-            printf("I: offset is now: %d\n", detect_settings->getReflineSettings().offset);
+
+            const int offset_before = detect_settings->getReflineSettings().offset;
+            const int offset_delta = data.value<int>("offset", 0);
+            detect_settings->add_offset_delta(offset_delta);
+
+            printf("I: offset/set: was: %d. delta: %d. now: %d\n"
+                , offset_before
+                , offset_delta
+                , detect_settings->getReflineSettings().offset);
+            res.status = 200;
+        }
+        catch(const std::exception& e)
+        {
+            fprintf(stderr, "/offset/delta: %s\n", e.what());
+            res.status = 500;
+            res.set_content(e.what(), "text/plain");
+        }
+    });
+    svr->Post("/offset/set", [=](const Request &req, Response &res)
+    {
+        try
+        {
+            nlohmann::json data = nlohmann::json::parse(req.body);
+
+            const int offset_before = detect_settings->getReflineSettings().offset;
+            const int offset_value = data.value<int>("offset", 0);
+            detect_settings->set_offset(offset_value);
+
+            printf("I: offset/set was: %d. now: %d\n"
+                , offset_before
+                , detect_settings->getReflineSettings().offset);
+            res.status = 200;
+        }
+        catch(const std::exception& e)
+        {
+            fprintf(stderr, "/offset/set: %s\n", e.what());
+            res.status = 500;
+            res.set_content(e.what(), "text/plain");
+        }
+    });
+    svr->Post("/offset/setzero", [=](const Request &req, Response &res)
+    {
+        try
+        {
+            detect_settings->set_offset_zero();
+            printf("I: offset is set to zero: now: %d\n", detect_settings->getReflineSettings().offset);
             res.status = 200;
         }
         catch(const std::exception& e)
@@ -104,7 +142,7 @@ void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
             res.status = 500;
             res.set_content(e.what(), "text/plain");
         }
-    });
+    });    
 }
 
 void URL_applyChanges(httplib::Server* svr, DetectSettings* detect_settings)
@@ -157,14 +195,16 @@ void URL_current(httplib::Server* svr, DetectSettings* settings)
     });
 }
 
-void URL_stats(httplib::Server* svr, const Stats* diff)
+void URL_stats(httplib::Server* svr, const Stats* diff, const ImageSettings* imageSettings)
 {
     svr->Get("/stats", [=](__attribute__((unused)) const Request &req, Response &res) {
 
         using namespace std::chrono;
 
         nlohmann::json data;
-        data["camera"]["fps"] = diff->camera.frames / Stats::pause.count();
+        data["camera"]["fps"]    = diff->camera.frames / Stats::pause.count();
+        data["camera"]["width"]  = imageSettings->frame_cols;
+        data["camera"]["height"] = imageSettings->frame_rows;
 
         const auto overall_ms = duration_cast<milliseconds>(diff->detect.overall).count();
         data["detect"]["time_milliseconds"]["0_overall"]      = overall_ms;
@@ -211,7 +251,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCo
     URL_video(&svr, shared, pipeline, encoder_stats);
     URL_applyChanges(&svr, &shared->detectSettings );
     URL_current(&svr, &shared->detectSettings);
-    URL_stats(&svr, stats_diff);
+    URL_stats(&svr, stats_diff, &(shared->detectSettings.getImageSettings()) );
     URL_offset(&svr, &shared->detectSettings);
     //
     // ------------------------------------------------------------------------
