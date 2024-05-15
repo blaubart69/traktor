@@ -7,7 +7,7 @@ User=pi
 Group=pi
 Type=idle
 WorkingDirectory = /home/pi/dev/traktor/traktor/build
-ExecStart        = /home/pi/dev/traktor/traktor/build/traktor --width=960 --height=720
+ExecStart        = /home/pi/dev/traktor/traktor/build/traktor --width=960 --height=720 --port=80
 #StandardOutput=journal
 #StandardError=journal
 
