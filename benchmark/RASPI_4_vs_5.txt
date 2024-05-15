@@ -1,0 +1,37 @@
+RASPI 5
+
+bee@raspberrypi:~/dev/traktor/benchmark $ build/gcc/bench 
+--- 1. rows: 3, frames: 30---
+                  Classic:     347.094 ms, points:     20736000, delta_pixels_sum:    -105062, in: 11861490, out: 8874510
+  baseline float (simple):     129.717 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+       baseline int (mul):      98.462 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+       baseline float mul:     142.863 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+       baseline short int:     108.080 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+      baseline only float:     383.665 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+             baseline v16:     213.173 ms, points:     20736000, delta_pixels_sum:    -109740, in: 11867280, out: 8868720
+            highway int32:     116.649 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+            highway int16:     109.135 ms, points:     20736000, delta_pixels_sum:    2098260, in: 11920170, out: 8815830
+     baseline simple loop:     112.376 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+=====
+Highway target: NEON
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+RASPI 4
+
+bee@raspberrypi:~/dev/traktor/benchmark $ build/gcc/bench 
+--- 1. rows: 3, frames: 30---
+                  Classic:     703.003 ms, points:     20736000, delta_pixels_sum:    -105062, in: 11861490, out: 8874510
+  baseline float (simple):     294.377 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+       baseline int (mul):     203.526 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+       baseline float mul:     310.158 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+       baseline short int:     198.117 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+      baseline only float:     771.198 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+             baseline v16:     334.356 ms, points:     20736000, delta_pixels_sum:    -109740, in: 11867280, out: 8868720
+            highway int32:     329.758 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+       highway int32 only:     469.028 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+            highway int16:     376.272 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+       highway int16 fdiv:     243.963 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+     baseline simple loop:     264.667 ms, points:     20736000, delta_pixels_sum:    -114540, in: 11851020, out: 8884980
+=====
+Highway target: NEON_WITHOUT_AES
