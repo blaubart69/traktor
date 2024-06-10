@@ -223,16 +223,15 @@ static void join_thread(std::thread* t, const char* name)
 void ImagePipeline::shutdown()
 //-----------------------------------------------------------------------------
 {
-    puts("set all slots busy to exit camera thread");
-    set_all_full();
-    join_thread(&_threads[0], "camera");
+    write(_DetectToEncode, ACTION_EXIT);
+    join_thread(&_threads[2], "encode");
 
     write(_CameraToDetect, ACTION_EXIT);
     join_thread(&_threads[1], "detect");
     
-    write(_DetectToEncode, ACTION_EXIT);
-    join_thread(&_threads[2], "encode");
-
+    puts("set all slots busy to exit camera thread");
+    set_all_full();
+    join_thread(&_threads[0], "camera");
 }
 void ImagePipeline::start_camera_1(std::function<void(Workitem*,CameraContext*)> process, CameraContext* context)
 {
