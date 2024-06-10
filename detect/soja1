@@ -1,1 +1,1 @@
-{"colorFrom":[36,25,53],"colorTo":[102,180,209],"erode":2,"dilate":0,"minimalContourArea":538,"maxRows":1,"rowThresholdPx":17,"rowSpacingPx":463,"rowPerspectivePx":180,"rowRangePx":10}
+{"colorFrom":[36,25,53],"colorTo":[102,180,209],"erode":2,"dilate":0,"minimalContourArea":538,"maxRows":1,"rowThresholdPx":17,"rowSpacingPx":463,"rowPerspectivePx":180,"rowRangePx":10,"offsetPx":0}
