@@ -116,21 +116,35 @@ static void write_text_to_status_bar(const cv::String& text, cv::Mat* bar)
     cv::putText(*bar, text, cv::Point(10, 19), cv::FONT_HERSHEY_SIMPLEX, 0.8, RED, 2);
 }
 
+static void write_text_to_status_bar_right(const cv::String& text, cv::Mat* bar) 
+{
+    int baseline=0;
+    const cv::Size textsize = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.8, 2, &baseline );
+    const int x_start = bar->cols - textsize.width - 10;
+    cv::putText(*bar, text, cv::Point(x_start, 19), cv::FONT_HERSHEY_SIMPLEX, 0.8, WHITE, 2);
+}
+
 static void draw_threshold_bar(const bool within_threshold, const int avg_delta_px, const int x_half, cv::Mat* bar)
 {
     const cv::Scalar& color_overall_delta = within_threshold ? GREEN : RED;
     cv::rectangle(*bar, cv::Point(x_half,0), cv::Point(x_half + avg_delta_px,bar->rows), color_overall_delta, cv::FILLED);
 }
 
-static void draw_status_bar(cv::Mat& frame, const DetectResult& detect_result, const int x_half, std::unique_ptr<cv::Mat>& status_bar)
+static void draw_status_bar(cv::Mat& frame, const DetectResult& detect_result, const int x_half, const bool isHarrowLifted, std::unique_ptr<cv::Mat>& status_bar)
 {
     init_status_bar(frame, status_bar);
-
+    /*
     if ( detect_result.state == DETECT_STATE::HARROW_LIFTED )
     {
         write_text_to_status_bar("LIFTED", status_bar.get());
     }
-    else if ( detect_result.state == DETECT_STATE::NO_PLANTS_WITHIN_LINES )
+    else 
+    */
+    if ( isHarrowLifted ) {
+        write_text_to_status_bar_right("LIFTED", status_bar.get());
+    }
+
+    if ( detect_result.state == DETECT_STATE::NO_PLANTS_WITHIN_LINES )
     {
         write_text_to_status_bar("NO PLANTS WITHIN LINES", status_bar.get());
     }
@@ -159,7 +173,7 @@ WORKER_RC encode_main(Workitem* work, EncodeContext* ctx)
         auto start = overall_start;
         draw_row_lines        (work->frame, ctx->shared->detectSettings.getReflineSettings());
         draw_contoures_centers(work->frame, work->detect_result);
-        draw_status_bar       (work->frame, work->detect_result, ctx->shared->detectSettings.getReflineSettings().x_half, ctx->status_bar);
+        draw_status_bar       (work->frame, work->detect_result, ctx->shared->detectSettings.getReflineSettings().x_half, ctx->shared->harrowLifted.load(), ctx->status_bar);
         ctx->stats->draw += trk::get_duration(&start).count();
     }
     

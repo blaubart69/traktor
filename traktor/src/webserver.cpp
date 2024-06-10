@@ -320,7 +320,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCo
     //
     svr.Get("/debug/lift",  [&](__attribute__((unused)) const Request &req, Response &res) {
         shared->harrowLifted.store(true);
-        puts("/debug/lift - shared->harrowLifted.store(true)");
+        printf("D: %s - shared->harrowLifted.store(true)\n", req.path.c_str());
         res.status = 200;
     });
     //
@@ -328,7 +328,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCo
     //
     svr.Get("/debug/unlift", [&](__attribute__((unused)) const Request &req, Response &res) {
         shared->harrowLifted.store(false);
-        puts("/debug/lift - shared->harrowLifted.store(false)");
+        printf("D: %s - shared->harrowLifted.store(false)\n", req.path.c_str());
         res.status = 200;
     });
     const char* host = "0.0.0.0";
