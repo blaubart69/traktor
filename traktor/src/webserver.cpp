@@ -334,7 +334,10 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCo
     const char* host = "0.0.0.0";
     printf("I: webserver start listening on %s:%d\n", host, port);
     //svr.listen("0.0.0.0", port);
-    svr.listen(host, port);
+    if ( !svr.listen(host, port) ) {
+      printf("E: FAILED listening on %s:%d\n  >>sudo setcap 'cap_net_bind_service=+ep' ./traktor<< ??\n", host, port);
+      return -1;
+    }
 
     return 0;
 }
