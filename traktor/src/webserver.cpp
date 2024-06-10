@@ -128,7 +128,7 @@ void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
             res.set_content(e.what(), "text/plain");
         }
     });
-    svr->Post("/offset/setzero", [=](const Request &req, Response &res)
+    svr->Post("/offset/setzero", [=](__attribute__((unused)) const Request &req, Response &res)
     {
         try
         {
@@ -217,7 +217,7 @@ void URL_stats(httplib::Server* svr, const Stats* diff, const ImageSettings* ima
 
         const auto fps = diff->detect.frames / Stats::pause.count();
         data["detect"]["image"]["fps"]                        = fps;
-        data["detect"]["image"]["MB/s"]                       = diff->detect.frame_bytes / 1024 / 1024 / Stats::pause.count();
+        data["detect"]["image"]["MB/s"]                       = diff->detect.frame_bytes / 1024 / 1024 / (uint64_t)Stats::pause.count();
         if ( fps != 0 )
         {
             const auto available_ms = 1000 / fps;
@@ -225,8 +225,8 @@ void URL_stats(httplib::Server* svr, const Stats* diff, const ImageSettings* ima
             data["detect"]["image"]["time_used_%"]              = (int)( (float)overall_ms / (float)available_ms * 100.0 );
         }
 
-        data["encode"]["kB/s"]      = diff->encode.bytes_sent  / 1024 / Stats::pause.count();
-        data["encode"]["images/s"]  = diff->encode.images_sent / Stats::pause.count(); 
+        data["encode"]["kB/s"]      = diff->encode.bytes_sent  / 1024 / (uint64_t)Stats::pause.count();
+        data["encode"]["images/s"]  = diff->encode.images_sent / (uint64_t)Stats::pause.count(); 
         data["encode"]["draw"]      = duration_cast<milliseconds>( nanoseconds(diff->encode.draw) ).count();
         data["encode"]["overall"]   = duration_cast<milliseconds>( nanoseconds(diff->encode.overall) ).count();
 

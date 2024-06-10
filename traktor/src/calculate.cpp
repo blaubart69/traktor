@@ -27,9 +27,9 @@ struct CalcSettings
     const int rowPerspectivePx;
     const int y_baseline;
     const int offset;
-    const unsigned int refline_distance;
-    const unsigned int half_refline_distance;
-    const unsigned int range_baseline;
+    const int refline_distance;
+    const int half_refline_distance;
+    const int range_baseline;
 
     CalcSettings(int x_half, int y_screen_size, int rowPerspectivePx, int refline_distance, int offset, int row_count) 
     :   x_half(x_half)
@@ -91,9 +91,9 @@ PRIVATE int apply_offset(int x, int offset)
     return x_offset;
 }
 
-PRIVATE bool is_within_range(int x, const unsigned int range_baseline)
+PRIVATE bool is_within_range(int x, const int range_baseline)
 {
-    return (unsigned int)std::abs(x) < range_baseline;
+    return std::abs(x) < range_baseline;
 }
 
 PRIVATE int project_x_inbetween_first_row(const int x_baseline, const int refline_distance) 

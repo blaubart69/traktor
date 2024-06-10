@@ -160,10 +160,10 @@ bool ImagePipeline::read(Postbox& postbox, int32_t* new_idx) {
 
 }
 //-----------------------------------------------------------------------------
-int8_t ImagePipeline::get_free() {
+int32_t ImagePipeline::get_free() {
 //-----------------------------------------------------------------------------
 
-    for (int8_t i=0; i < 5; ++i) {
+    for (int32_t i=0; i < 5; ++i) {
         bool expected = true;
         if ( _Free[i].compare_exchange_strong(
                             expected
@@ -177,7 +177,7 @@ int8_t ImagePipeline::get_free() {
 
 }
 //-----------------------------------------------------------------------------
-void ImagePipeline::set_free(int8_t idx) {
+void ImagePipeline::set_free(int32_t idx) {
 //-----------------------------------------------------------------------------
 
     //printf("free: %d\n", idx);

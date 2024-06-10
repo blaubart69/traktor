@@ -59,10 +59,10 @@ private:
     bool read (Postbox& postbox, int32_t* idx);
     bool write(Postbox& postbox, int32_t write_idx);
 
-    int8_t get_free();
-    void   set_free(int8_t idx);
-    void   set_all_free();
-    void   set_all_full();
+    int32_t get_free();
+    void    set_free(int32_t idx);
+    void    set_all_free();
+    void    set_all_full();
 
     void camera_1(std::function<void     (Workitem*,CameraContext*)> process, CameraContext* context);
     void detect_2(std::function<void     (Workitem*,DetectContext*)> process, DetectContext* context);
