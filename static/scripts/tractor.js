@@ -15,7 +15,7 @@ angular.module('tractor', ['ui.bootstrap', 'rzSlider'])
     $scope.maxRowSlider         = { value:   0, options: { floor:  0, ceil:   10, onChange: function(s, m, h, p) { applyChanges(); } } };
     $scope.rowThresholdPxSlider = { value:   5, options: { floor:  1, ceil:  320, onChange: function(s, m, h, p) { applyChanges(); } } };
     $scope.rowSpacingPxSlider   = { value: 160, options: { floor: 10, ceil: 1000, onChange: function(s, m, h, p) { applyChanges(); } } };
-    $scope.rowPerspectiveSlider = { value: 200, options: { floor:  0, ceil:  300, onChange: function(s, m, h, p) { applyChanges(); } } };
+    $scope.rowPerspectiveSlider = { value: 200, options: { floor:  0, ceil:  600, onChange: function(s, m, h, p) { applyChanges(); } } };
     $scope.rowRangePxSlider     = { value:   5, options: { floor:  0, ceil:  320, onChange: function(s, m, h, p) { applyChanges(); } } };
 
     $scope.OffsetPxSlider       = { minValue:  -200, maxValue: 200, value:   0, options: { floor:  -100, ceil:  100, onChange: function(s, m, h, p) { applyChanges(); } } };
