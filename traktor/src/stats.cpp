@@ -2,56 +2,84 @@
 
 #include "stats.h"
 
-const std::chrono::seconds Stats::pause = std::chrono::seconds(2);
+const std::chrono::seconds Stats::pause{2};
 
-void Stats::diff(const Stats &incremented, const Stats &last, Stats *diff)
+template<class T>
+void assign_relaxed( std::atomic<T>& lhs, const std::atomic<T>& rhs )
 {
-    diff->camera.frames = incremented.camera.frames - last.camera.frames;
-
-    diff->detect.frames = incremented.detect.frames - last.detect.frames;
-    diff->detect.frame_bytes = incremented.detect.frame_bytes - last.detect.frame_bytes;
-
-    if (diff->detect.frames > 0)
-    {
-        diff->detect.cvtColor = (incremented.detect.cvtColor - last.detect.cvtColor) / diff->detect.frames;
-        diff->detect.GaussianBlur = (incremented.detect.GaussianBlur - last.detect.GaussianBlur) / diff->detect.frames;
-        diff->detect.inRange = (incremented.detect.inRange - last.detect.inRange) / diff->detect.frames;
-        diff->detect.erode = (incremented.detect.erode - last.detect.erode) / diff->detect.frames;
-        diff->detect.dilate = (incremented.detect.dilate - last.detect.dilate) / diff->detect.frames;
-        diff->detect.findContours = (incremented.detect.findContours - last.detect.findContours) / diff->detect.frames;
-        diff->detect.overall = (incremented.detect.overall - last.detect.overall) / diff->detect.frames;
-    }
-
-    diff->encode.bytes_sent  = incremented.encode.bytes_sent - last.encode.bytes_sent;
-    diff->encode.images_sent = incremented.encode.images_sent - last.encode.images_sent;
-    //printf("inc images_sent: %lu, last images_sent: %lu\n", incremented.encode.images_sent.load(), last.encode.images_sent.load());
-
-    if (diff->encode.images_sent > 0)
-    {
-        diff->encode.draw = (incremented.encode.draw.load() - last.encode.draw.load()) / diff->encode.images_sent;
-        diff->encode.overall = (incremented.encode.overall.load() - last.encode.overall.load()) / diff->encode.images_sent;
-        //printf("inc overall: %lu, last overall: %lu\n", incremented.encode.overall.load(), last.encode.overall.load());
-    }
+    lhs.store( rhs.load(std::memory_order_relaxed), std::memory_order_relaxed );
 }
 
-Stats &Stats::operator=(const Stats &rhs)
+void Stats::tick()
 {
-    this->camera.frames = rhs.camera.frames;
+    diff.camera.frames = camera.frames - last.camera.frames;
 
-    this->detect.cvtColor = rhs.detect.cvtColor;
-    this->detect.dilate = rhs.detect.dilate;
-    this->detect.erode = rhs.detect.erode;
-    this->detect.findContours = rhs.detect.findContours;
-    this->detect.frame_bytes = rhs.detect.frame_bytes;
-    this->detect.frames = rhs.detect.frames;
-    this->detect.GaussianBlur = rhs.detect.GaussianBlur;
-    this->detect.inRange = rhs.detect.inRange;
-    this->detect.overall = rhs.detect.overall;
+    diff.detect.frames = detect.frames - last.detect.frames;
+    diff.detect.frame_bytes = detect.frame_bytes - last.detect.frame_bytes;
 
-    this->encode.bytes_sent = rhs.encode.bytes_sent.load();
-    this->encode.draw = rhs.encode.draw.load();
-    this->encode.images_sent = rhs.encode.images_sent.load();
-    this->encode.overall = rhs.encode.overall.load();
+    diff.detect.plants_in_picture    = detect.plants_in_picture    - last.detect.plants_in_picture;
+    diff.detect.plants_out_range     = detect.plants_out_range     - last.detect.plants_out_range;
+    diff.detect.plants_out_tolerance = detect.plants_out_tolerance - last.detect.plants_out_tolerance;
+    diff.detect.plants_in_tolerance  = detect.plants_in_tolerance  - last.detect.plants_in_tolerance;
+
+    if (diff.detect.frames > 0)
+    {
+        diff.detect.cvtColor     = (detect.cvtColor     - last.detect.cvtColor     ); // / diff.detect.frames;
+        diff.detect.GaussianBlur = (detect.GaussianBlur - last.detect.GaussianBlur ); // / diff.detect.frames;
+        diff.detect.inRange      = (detect.inRange      - last.detect.inRange      ); // / diff.detect.frames;
+        diff.detect.erode        = (detect.erode        - last.detect.erode        ); // / diff.detect.frames;
+        diff.detect.dilate       = (detect.dilate       - last.detect.dilate       ); // / diff.detect.frames;
+        diff.detect.findContours = (detect.findContours - last.detect.findContours ); // / diff.detect.frames;
+        diff.detect.overall      = (detect.overall      - last.detect.overall      ); // / diff.detect.frames;
+    }
+
+    diff.encode.bytes_sent  = encode.bytes_sent - last.encode.bytes_sent;
+    diff.encode.images_sent = encode.images_sent - last.encode.images_sent;
+
+    if (diff.encode.images_sent > 0)
+    {
+        diff.encode.draw    = (encode.draw.load()    - last.encode.draw.load());    // / diff.encode.images_sent;
+        diff.encode.overall = (encode.overall.load() - last.encode.overall.load()); /// diff.encode.images_sent;
+    }
+
+    this->last.camera = this->camera;
+    this->last.detect = this->detect;
+    this->last.encode = this->encode;
+}
+
+CameraCounter& CameraCounter::operator= (const CameraCounter& rhs)
+{
+    this->frames = rhs.frames;
+
+    return *this;
+}
+
+DetectCounter& DetectCounter::operator= (const DetectCounter& rhs)
+{
+    this->cvtColor = rhs.cvtColor;
+    this->dilate = rhs.dilate;
+    this->erode = rhs.erode;
+    this->findContours = rhs.findContours;
+    this->frame_bytes = rhs.frame_bytes;
+    this->frames = rhs.frames;
+    this->GaussianBlur = rhs.GaussianBlur;
+    this->inRange = rhs.inRange;
+    this->overall = rhs.overall;
+
+    assign_relaxed(this->plants_in_picture,     rhs.plants_in_picture);
+    assign_relaxed(this->plants_out_range,      rhs.plants_out_range);
+    assign_relaxed(this->plants_out_tolerance,  rhs.plants_out_tolerance);
+    assign_relaxed(this->plants_in_tolerance,   rhs.plants_in_tolerance);
+
+    return *this;
+}
+
+EncodeCounter& EncodeCounter::operator= (const EncodeCounter& rhs)
+{
+    assign_relaxed(this->bytes_sent,  rhs.bytes_sent);
+    assign_relaxed(this->draw,        rhs.draw);
+    assign_relaxed(this->images_sent, rhs.images_sent);
+    assign_relaxed(this->overall,     rhs.overall);
 
     return *this;
 }

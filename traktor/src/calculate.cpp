@@ -2,6 +2,7 @@
 
 #include "detect.h"
 #include "calculate.h"
+#include "stats.h"
 
 #define PRIVATE static
 
@@ -154,7 +155,7 @@ PRIVATE bool calc_delta_from_nearest_refline(const int x_screen, const int y_scr
     return true;
 }
 
-bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_rows, Contoures* contoures, int* avg_deltaPx)
+bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_rows, Contoures* contoures, int* avg_deltaPx, DetectCounter* stats)
 {
     CalcSettings calcSettings(
         refSettings.x_half
@@ -178,6 +179,7 @@ bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_row
         {
             plant.within_threshold = false;
             plant.within_row_range = false;
+            stats->plants_out_range.fetch_add(1, std::memory_order_relaxed);
         }
         else 
         {
@@ -196,11 +198,21 @@ bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_row
             {
                 // plant is out of range AND also out of threshold:
                 // plant is skipped. not used for average.
+                stats->plants_out_range.fetch_add(1, std::memory_order_relaxed);
             }
             else
             {
                 plants_processed += 1;
                 sum_deltaPx += deltaPx;
+                
+                if ( std::abs(deltaPx) <= refSettings.rowThresholdPx )
+                {
+                    stats->plants_in_tolerance.fetch_add(1, std::memory_order_relaxed);
+                }
+                else
+                {
+                    stats->plants_out_tolerance.fetch_add(1, std::memory_order_relaxed);
+                }
             }
         }
     }
@@ -208,6 +220,8 @@ bool calc_average_delta(const ReflinesSettings& refSettings, const int frame_row
         *avg_deltaPx = sum_deltaPx / plants_processed;
         //printf("calc_average_delta: plants_processed: %d, sum_deltaPx: %d avg_deltaPx: %d\n", plants_processed, sum_deltaPx, *avg_deltaPx);
     }
+
+    stats->plants_in_picture.fetch_add((uint32_t)contoures->centers.size());
 
     return plants_processed > 0;
 }

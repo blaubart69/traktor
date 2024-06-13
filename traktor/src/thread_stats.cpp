@@ -14,16 +14,13 @@ float ns_to_ms_per_fps(uint64 ns, int fps)
 }
 */
 
-void thread_stats(const std::atomic_bool& shutdown_requested, const Stats& stats, Stats* diff)
+void thread_stats(const std::atomic_bool& shutdown_requested, Stats& stats)
 {
-    Stats last;
-
     for (;;)
     {
         std::this_thread::sleep_for( stats.pause );
 
-        Stats::diff(stats, last, diff);
-        last = stats;
+        stats.tick();
 
         if ( shutdown_requested.load() )
         {

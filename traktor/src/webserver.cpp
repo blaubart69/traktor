@@ -24,7 +24,7 @@ WORKER_RC encode_main(Workitem* work, EncodeContext* ctx);
  *  Don't know right now why.
  */
 
-void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, EncodeCounter* encode_stats)
+void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, Stats* stats)
 {
     svr->Get("/video", [=](__attribute__((unused)) const Request &req, Response &res) {
 
@@ -51,7 +51,10 @@ void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, En
                 //
                 // begin of JPEG streaming
                 //
-                EncodeContext ctx(encode_stats, shared,
+                EncodeContext ctx(
+                    &(stats->encode), 
+                    &(stats->detect),
+                    shared,
                     [&sink](std::vector<unsigned char>& jpegBytes, uint64_t* bytes_sent) {
                         // yield(b'--Ba4oTvQMY8ew04N8dcnM\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
                         jpegBytes.insert(jpegBytes.end(), CRLF.begin(), CRLF.end());
@@ -195,7 +198,7 @@ void URL_current(httplib::Server* svr, DetectSettings* settings)
     });
 }
 
-void URL_stats(httplib::Server* svr, const Stats* diff, const ImageSettings* imageSettings)
+void URL_stats(httplib::Server* svr, const Counter* diff, const ImageSettings* imageSettings)
 {
     svr->Get("/stats", [=](__attribute__((unused)) const Request &req, Response &res) {
 
@@ -207,22 +210,29 @@ void URL_stats(httplib::Server* svr, const Stats* diff, const ImageSettings* ima
         data["camera"]["height"] = imageSettings->frame_rows;
 
         const auto overall_ms = duration_cast<milliseconds>(diff->detect.overall).count();
-        data["detect"]["time_milliseconds"]["0_overall"]      = overall_ms;
-        data["detect"]["time_milliseconds"]["1_cvtColor"]     = duration_cast<milliseconds>(diff->detect.cvtColor).count();
-        data["detect"]["time_milliseconds"]["2_GaussianBlur"] = duration_cast<milliseconds>(diff->detect.GaussianBlur).count();
-        data["detect"]["time_milliseconds"]["3_inRange"]      = duration_cast<milliseconds>(diff->detect.inRange).count();
-        data["detect"]["time_milliseconds"]["4_erode"]        = duration_cast<milliseconds>(diff->detect.erode).count();
-        data["detect"]["time_milliseconds"]["5_dilate"]       = duration_cast<milliseconds>(diff->detect.dilate).count();
-        data["detect"]["time_milliseconds"]["6_findContours"] = duration_cast<milliseconds>(diff->detect.findContours).count();
+        const auto detect_fps = diff->detect.frames / Stats::pause.count();
 
-        const auto fps = diff->detect.frames / Stats::pause.count();
-        data["detect"]["image"]["fps"]                        = fps;
+        data["detect"]["time_ms_per_frame"]["0_overall"]      = overall_ms;
+        data["detect"]["time_ms_per_frame"]["1_cvtColor"]     = duration_cast<milliseconds>(diff->detect.cvtColor).count()      / diff->detect.frames;      
+        data["detect"]["time_ms_per_frame"]["2_GaussianBlur"] = duration_cast<milliseconds>(diff->detect.GaussianBlur).count()  / diff->detect.frames;
+        data["detect"]["time_ms_per_frame"]["3_inRange"]      = duration_cast<milliseconds>(diff->detect.inRange).count()       / diff->detect.frames;
+        data["detect"]["time_ms_per_frame"]["4_erode"]        = duration_cast<milliseconds>(diff->detect.erode).count()         / diff->detect.frames;
+        data["detect"]["time_ms_per_frame"]["5_dilate"]       = duration_cast<milliseconds>(diff->detect.dilate).count()        / diff->detect.frames;
+        data["detect"]["time_ms_per_frame"]["6_findContours"] = duration_cast<milliseconds>(diff->detect.findContours).count()  / diff->detect.frames;
+
+        
+        data["detect"]["image"]["fps"]                        = detect_fps;
         data["detect"]["image"]["MB/s"]                       = diff->detect.frame_bytes / 1024 / 1024 / (uint64_t)Stats::pause.count();
-        if ( fps != 0 )
+        if ( detect_fps != 0 )
         {
-            const auto available_ms = 1000 / fps;
+            const auto available_ms = 1000 / detect_fps;
             data["detect"]["image"]["available_ms_one_frame"]   = available_ms;
             data["detect"]["image"]["time_used_%"]              = (int)( (float)overall_ms / (float)available_ms * 100.0 );
+
+            data["detect"]["plants"]["0_in_picture"]    = diff->detect.plants_in_picture.load()     / diff->detect.frames;
+            data["detect"]["plants"]["1_out_range"]     = diff->detect.plants_out_range.load()      / diff->detect.frames;
+            data["detect"]["plants"]["2_out_tolerance"] = diff->detect.plants_out_tolerance.load()  / diff->detect.frames;
+            data["detect"]["plants"]["3_in_tolerance"]  = diff->detect.plants_in_tolerance.load()   / diff->detect.frames;
         }
 
         data["encode"]["kB/s"]      = diff->encode.bytes_sent  / 1024 / (uint64_t)Stats::pause.count();
@@ -235,7 +245,7 @@ void URL_stats(httplib::Server* svr, const Stats* diff, const ImageSettings* ima
         res.status = 200;
     });
 }
-int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCounter* encoder_stats, Stats* stats_diff)
+int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, Stats* stats)
 {
     Server svr;
 
@@ -248,10 +258,10 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, EncodeCo
         return 1;
     }
 
-    URL_video(&svr, shared, pipeline, encoder_stats);
+    URL_video(&svr, shared, pipeline, stats);
     URL_applyChanges(&svr, &shared->detectSettings );
     URL_current(&svr, &shared->detectSettings);
-    URL_stats(&svr, stats_diff, &(shared->detectSettings.getImageSettings()) );
+    URL_stats(&svr, &stats->diff, &(shared->detectSettings.getImageSettings()) );
     URL_offset(&svr, &shared->detectSettings);
     //
     // ------------------------------------------------------------------------

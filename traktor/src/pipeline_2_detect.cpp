@@ -147,7 +147,12 @@ void detect_main(Workitem* work, DetectContext* ctx)
     {
         work->detect_result.state = DETECT_STATE::NOTHING_FOUND;
     }
-    else if ( ! calc_average_delta(refline_settings, work->frame.rows, &(work->detect_result.contoures), &(work->detect_result.avg_delta_px) ) )
+    else if ( ! calc_average_delta(
+        refline_settings
+        , work->frame.rows
+        , &(work->detect_result.contoures)
+        , &(work->detect_result.avg_delta_px)
+        , ctx->stats) )
     {
         work->detect_result.state = DETECT_STATE::NO_PLANTS_WITHIN_LINES;
     }
