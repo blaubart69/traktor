@@ -209,7 +209,7 @@ void URL_stats(httplib::Server* svr, const Counter* diff, const ImageSettings* i
         data["camera"]["width"]  = imageSettings->frame_cols;
         data["camera"]["height"] = imageSettings->frame_rows;
 
-        const auto overall_ms = duration_cast<milliseconds>(diff->detect.overall).count();
+        const auto overall_ms = duration_cast<milliseconds>(diff->detect.overall).count() / diff->detect.frames;
         const auto detect_fps = diff->detect.frames / Stats::pause.count();
 
         data["detect"]["time_ms_per_frame"]["0_overall"]      = overall_ms;
@@ -223,6 +223,7 @@ void URL_stats(httplib::Server* svr, const Counter* diff, const ImageSettings* i
         
         data["detect"]["image"]["fps"]                        = detect_fps;
         data["detect"]["image"]["MB/s"]                       = diff->detect.frame_bytes / 1024 / 1024 / (uint64_t)Stats::pause.count();
+        
         if ( detect_fps != 0 )
         {
             const auto available_ms = 1000 / detect_fps;

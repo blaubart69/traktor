@@ -12,10 +12,10 @@ void assign_relaxed( std::atomic<T>& lhs, const std::atomic<T>& rhs )
 
 void Stats::tick()
 {
-    diff.camera.frames = camera.frames - last.camera.frames;
+    diff.camera.frames              = camera.frames         - last.camera.frames;
 
-    diff.detect.frames = detect.frames - last.detect.frames;
-    diff.detect.frame_bytes = detect.frame_bytes - last.detect.frame_bytes;
+    diff.detect.frames              = detect.frames         - last.detect.frames;
+    diff.detect.frame_bytes         = detect.frame_bytes    - last.detect.frame_bytes;
 
     diff.detect.plants_in_picture    = detect.plants_in_picture    - last.detect.plants_in_picture;
     diff.detect.plants_out_range     = detect.plants_out_range     - last.detect.plants_out_range;
@@ -33,7 +33,7 @@ void Stats::tick()
         diff.detect.overall      = (detect.overall      - last.detect.overall      ); // / diff.detect.frames;
     }
 
-    diff.encode.bytes_sent  = encode.bytes_sent - last.encode.bytes_sent;
+    diff.encode.bytes_sent  = encode.bytes_sent  - last.encode.bytes_sent;
     diff.encode.images_sent = encode.images_sent - last.encode.images_sent;
 
     if (diff.encode.images_sent > 0)

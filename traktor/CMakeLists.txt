@@ -30,7 +30,10 @@ set(SOURCES
     src/harrow.h
     src/harrow.cpp
     src/thread_center_harrow.cpp
+    src/calculate.h
     src/calculate.cpp
+    src/calculate_short_int.h
+    src/calculate_short_int.cpp
     src/pipeline/auto_reset_event.cpp
     src/pipeline/auto_reset_event.hpp
     src/pipeline/Postbox.cpp

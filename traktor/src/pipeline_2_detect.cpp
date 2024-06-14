@@ -2,7 +2,9 @@
 
 #include "detect.h"
 #include "pipeline/ImagePipeline.hpp"
-#include "calculate.h"
+
+//#include "calculate.h"
+#include "calculate_short_int.h"
 
 void init_status_bar(int frame_columns, int frame_type, std::unique_ptr<cv::Mat>& status_bar)
 {
@@ -66,11 +68,11 @@ void find_contours(const ImageSettings& settings, DetectCounter* stats, const cv
     }*/
 }
 
-void calc_center_of_contour(const std::vector<cv::Point2i>& points, cv::Point* center)
+void calc_center_of_contour(const std::vector<cv::Point2i>& points, int16_t* x, int16_t* y)
 {
     cv::Moments M = cv::moments(points);
-    center->x = int(M.m10 / M.m00);
-	center->y = int(M.m01 / M.m00);
+    *x = int16_t(M.m10 / M.m00);
+	*y = int16_t(M.m01 / M.m00);
 }
 
 void calc_centers_of_contours(Contoures* found, const int minimalContourArea)
@@ -83,10 +85,11 @@ void calc_centers_of_contours(Contoures* found, const int minimalContourArea)
             //
             // calc center and add it to centers
             //
-            cv::Point2i centerPoint;
-            calc_center_of_contour(contour, &centerPoint);
+            int16_t x;
+            int16_t y;
+            calc_center_of_contour(contour, &x, &y);
             //found->centers.emplace_back( centerPoint.x, centerPoint.y );
-            found->centers.emplace_back((int)i, centerPoint.x, centerPoint.y);
+            found->centers.emplace_back((int)i, x, y);
             //
             // remember index of found center to access the corresponding contour afterwards
             //
@@ -147,7 +150,7 @@ void detect_main(Workitem* work, DetectContext* ctx)
     {
         work->detect_result.state = DETECT_STATE::NOTHING_FOUND;
     }
-    else if ( ! calc_average_delta(
+    else if ( ! calc_average_delta_short_int(
         refline_settings
         , work->frame.rows
         , &(work->detect_result.contoures)

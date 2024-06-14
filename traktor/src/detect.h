@@ -13,14 +13,16 @@ enum DETECT_STATE
     SUCCESS
 };
 
+typedef cv::Point_<int16_t> Point2i16;
+
 struct Center
 {
     int contours_idx;
-    cv::Point2i point;
+    Point2i16 point;
     bool within_threshold;
     bool within_row_range;
 
-    Center(int idx, int x, int y)
+    Center(int idx, int16_t x, int16_t y)
     {
         contours_idx = idx;
         point.x = x;
