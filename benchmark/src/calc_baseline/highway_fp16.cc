@@ -1,15 +1,6 @@
 #include "hwy/highway.h"
 
-HWY_BEFORE_NAMESPACE();
-
-namespace deltapx {
-// This namespace name is unique per target, which allows code for multiple
-// targets to co-exist in the same translation unit. Required when using dynamic
-// dispatch, otherwise optional.
-
-namespace HWY_NAMESPACE {
-
-namespace hn = hwy::HWY_NAMESPACE;
+//#include "calc_baseline.h"
 
 struct CalcSettings
 {
@@ -32,6 +23,18 @@ struct CalcSettings
     {}
 };
 
+
+HWY_BEFORE_NAMESPACE();
+
+namespace deltapx {
+// This namespace name is unique per target, which allows code for multiple
+// targets to co-exist in the same translation unit. Required when using dynamic
+// dispatch, otherwise optional.
+
+namespace HWY_NAMESPACE {
+
+namespace hn = hwy::HWY_NAMESPACE;
+
 template <class DI>
 struct VCalcSettings
 {
@@ -50,7 +53,7 @@ struct VCalcSettings
     VI       half_refline_distance;
     VI minus_half_refline_distance;
 
-	ViCalcSettings(
+	VCalcSettings(
 		const DI di,
 		const CalcSettings& settings)
 	{
@@ -68,7 +71,7 @@ struct VCalcSettings
 
 //template <class DI, class DW, class DF>
 template <class DI, class DF>
-static int32_t ONE_delta_pixels_int16_fdiv(
+static int32_t ONE_delta_pixels_int16_fp16(
     const DI di
   //, const DW dw	
   , const DF df
@@ -152,7 +155,7 @@ static int32_t ONE_delta_pixels_int16_fdiv(
 	return count_valid_points;
 }
 
-int32_t hwy_calc_delta_pixels_int16_fdiv(
+int32_t hwy_calc_delta_pixels_int16_fp16(
 	  const size_t	size
   	, const int16_t* __restrict x_screen
   	, const int16_t* __restrict y_screen
@@ -175,7 +178,7 @@ int32_t hwy_calc_delta_pixels_int16_fdiv(
 	for (size_t i = 0; i < size; i += N) 
 	{
 		int32_t ONE_delta_px = 0;
-		valid_points += ONE_delta_pixels_int16_fdiv(di, di32, df, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
+		valid_points += ONE_delta_pixels_int16_fp16(di, df, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
 		*delta_pixels += ONE_delta_px;
 	}
 
@@ -187,8 +190,21 @@ int32_t hwy_calc_delta_pixels_int16_fdiv(
 }
 
 
-
 } // namespace HWY_NAMESPACE {
-//} // namespace deltspx
+} // namespace deltspx
 
 HWY_AFTER_NAMESPACE();
+
+namespace deltapx {
+
+	int32_t run_hwy_calc_delta_pixels_fp16(
+	  const size_t	size
+  	, const int16_t* __restrict x_screen
+  	, const int16_t* __restrict y_screen
+  	, const CalcSettings& settings
+  	, int32_t *delta_pixels )
+	{
+		return HWY_STATIC_DISPATCH(hwy_calc_delta_pixels_int16_fp16)(size, x_screen, y_screen, settings, delta_pixels );
+	}
+
+}

@@ -108,6 +108,13 @@ namespace deltapx {
   	, int32_t *delta_pixels );
 
     void print_target();
+
+    int32_t run_hwy_calc_delta_pixels_fp16(
+	  const size_t	size
+  	, const int16_t* __restrict x_screen
+  	, const int16_t* __restrict y_screen
+  	, const CalcSettings& settings
+  	, int32_t *delta_pixels );
 }
 
 void test_hwy_calc_delta_pixels();

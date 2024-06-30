@@ -299,8 +299,8 @@ int main()
 {
 
     //test_hwy_calc_delta_pixels();
-    play::run();
-    return 0;
+    //play::run();
+    //return 0;
 
     size_t frames = 30;
     int rows = 3;
@@ -319,6 +319,7 @@ int main()
         bench_highway<int32_t>             ("highway int32 only",    frames, rows, deltapx::run_hwy_calc_delta_pixels_int32_only);
         bench_highway<int16_t>             ("highway int16",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int16);
         bench_highway<int16_t>             ("highway int16 fdiv",    frames, rows, deltapx::run_hwy_calc_delta_pixels_int16_fdiv);
+        bench_highway<int16_t>             ("highway int16 fp16",    frames, rows, deltapx::run_hwy_calc_delta_pixels_fp16);
         
         bench_a_baseline_loop<CalcSettings>("baseline simple loop",  frames, rows, calc_baseline_full_loop);
     }

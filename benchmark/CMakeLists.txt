@@ -24,6 +24,7 @@ set(SOURCES
     /home/bee/dev/highway/hwy/print.cc
     /home/bee/dev/highway/hwy/targets.cc
     /home/bee/dev/highway/hwy/per_target.cc
+    /home/bee/dev/highway/hwy/abort.cc
     # ../traktor/src/calculate.cpp
 )
 
