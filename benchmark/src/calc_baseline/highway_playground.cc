@@ -63,7 +63,8 @@ void run()
 
     //const auto vy_f16 = hn::DemoteTo(half, hn::ConvertTo(df, hn::Load(di32, &y32[0] )));
 
-    
+    #if HWY_HAVE_F == 1
+    #endif
     
     #if HWY_HAVE_FLOAT16 == 1
 auto xDy = hn::Add(vx_f16,vy_f16);
