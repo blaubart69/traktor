@@ -5,9 +5,9 @@
 #include "calc_baseline/calc_baseline.h"
 
 void print_result(const char* impl_name, std::chrono::_V2::system_clock::rep duration_ns,
-    size_t points, int32_t delta_pixels_sum, size_t in_range, size_t out_range)
+    size_t points, int64_t delta_pixels_sum, size_t in_range, size_t out_range)
 {
-    printf("%25s: %11.3f ms, points: %12lu, delta_pixels_sum: %10d, in: %lu, out: %lu\n", 
+    printf("%25s\t%6.0f ms\tpoints: %12lu\tdelta_pixels_sum: %10d\tin: %lu\tout: %lu\n", 
         impl_name
         , ( (float)duration_ns / 1000000 )
         , points, delta_pixels_sum, in_range, out_range );
@@ -117,7 +117,7 @@ void bench_a_baseline(const char* impl_name, size_t frames, int rows, pfImpl bas
 
     auto start = std::chrono::high_resolution_clock::now();
 
-        int delta_pixels_sum = 0;
+        int64_t delta_pixels_sum = 0;
         size_t in_range = 0;
         size_t out_range = 0;
         size_t points = 0;
@@ -147,7 +147,7 @@ void bench_a_baseline(const char* impl_name, size_t frames, int rows, pfImpl bas
                         v_idx = 0;
 
                         for ( int v=0; v<N; v++) {
-                            int delta_pixels;
+                            int32_t delta_pixels;
                             if ( ! baselineImpl(v_x[v], v_y[v], calcSettings, &delta_pixels) )
                             {
                                 out_range += 1;
@@ -285,7 +285,7 @@ void bench_highway(const char* impl_name, size_t frames, int rows, pfImpl highwa
 
         #define N 64
 
-        int delta_pixels_sum = 0;
+        int64_t delta_pixels_sum = 0;
         size_t in_range = 0;
         size_t out_range = 0;
         size_t points = 0;
@@ -311,7 +311,7 @@ void bench_highway(const char* impl_name, size_t frames, int rows, pfImpl highwa
                     {
                         v_idx = 0;
 
-                        int delta_pixels;
+                        int32_t delta_pixels;
                         //int32_t valid_px = deltapx::run_hwy_calc_delta_pixels(N, v_x, v_y, calcSettings, &delta_pixels);
                         int32_t valid_px = highwayImpl(N, v_x, v_y, calcSettings, &delta_pixels);
                         in_range  +=      valid_px;
@@ -346,7 +346,7 @@ int main()
 
     for ( int i=1; i <= 1; i++)
     {
-        printf("--- %d. rows: %d, frames: %lu---\n", i, rows, frames);
+        //fprintf(stderr,"--- %d. rows: %d, frames: %lu---\n", i, rows, frames);
         bench_classic                               ("Classic",               frames, rows);
         bench_a_baseline<CalcSettings,int32_t>      ("baseline float (simple)", frames, rows, calc_baseline_delta_from_nearest_refline_simple);
         bench_a_baseline<CalcSettings,int32_t>      ("baseline int (mul)",    frames, rows, calc_baseline_delta_from_nearest_refline_int);
@@ -362,8 +362,8 @@ int main()
         
         //bench_a_baseline_loop<CalcSettings>("baseline simple loop",  frames, rows, calc_baseline_full_loop);
     }
-    printf("=====\n");
-    deltapx::print_target();
+    //printf("=====\n");
+    //deltapx::print_target();
 
     return 0;
 }
