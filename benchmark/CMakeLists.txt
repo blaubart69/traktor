@@ -19,8 +19,10 @@ set(SOURCES
     src/calc_classic/calc_classic.cpp
     src/calc_baseline/highway.cc
     src/calc_baseline/highway_fp16.cc
+    # src/calc_baseline/highway_fp16_v2.cc
     src/calc_baseline/test_highway.cpp
     src/calc_baseline/highway_playground.cc
+    src/calc_baseline/highway_mike.cc
     /home/bee/dev/highway/hwy/print.cc
     /home/bee/dev/highway/hwy/targets.cc
     /home/bee/dev/highway/hwy/per_target.cc

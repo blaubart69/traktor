@@ -1,6 +1,15 @@
 #include "hwy/highway.h"
 
-//#include "calc_baseline.h"
+HWY_BEFORE_NAMESPACE();
+
+//namespace deltapx {
+// This namespace name is unique per target, which allows code for multiple
+// targets to co-exist in the same translation unit. Required when using dynamic
+// dispatch, otherwise optional.
+
+namespace HWY_NAMESPACE {
+
+namespace hn = hwy::HWY_NAMESPACE;
 
 struct CalcSettings
 {
@@ -23,26 +32,14 @@ struct CalcSettings
     {}
 };
 
-
-HWY_BEFORE_NAMESPACE();
-
-namespace deltapx {
-// This namespace name is unique per target, which allows code for multiple
-// targets to co-exist in the same translation unit. Required when using dynamic
-// dispatch, otherwise optional.
-
-namespace HWY_NAMESPACE {
-
-namespace hn = hwy::HWY_NAMESPACE;
-
 template <class DI>
-struct VCalcSettings
+struct ViCalcSettings
 {
 	const DI di;
-	//const hn::RepartitionToWide<decltype(di)> dw;
+	const hn::RepartitionToWide<decltype(di)> dw;
 
 	using VI = hn::Vec<decltype(di)>;
-	//using VW = hn::Vec<decltype(dw)>;
+	using VW = hn::Vec<decltype(dw)>;
 
     VI x_half;           	         
     VI rowPerspectivePx; 	         
@@ -53,7 +50,7 @@ struct VCalcSettings
     VI       half_refline_distance;
     VI minus_half_refline_distance;
 
-	VCalcSettings(
+	ViCalcSettings(
 		const DI di,
 		const CalcSettings& settings)
 	{
@@ -68,29 +65,13 @@ struct VCalcSettings
 	}
 };
 
-template <class DI>
-int32_t sum_mod(
+
+template <class DI, class DW, class DF>
+static int32_t ONE_delta_pixels_int16_fdiv(
     const DI di
-  ,	const int16_t * HWY_RESTRICT a
-  , const int16_t * HWY_RESTRICT b) 
-{
-	
-	auto result = hn::Mod(
-		  hn::Load(di, a)
-		, hn::Load(di, b) );
-
-	auto sum = hn::ReduceSum(di, result);
-	return sum;
-}
-
-
-//template <class DI, class DW, class DF>
-template <class DI, class DF>
-static int32_t ONE_delta_pixels_int16_fp16(
-    const DI di
-  //, const DW dw	
+  , const DW dw	
   , const DF df
-  , const VCalcSettings<DI>& settings
+  , const ViCalcSettings<DI>& settings
   ,	const int16_t * HWY_RESTRICT x_point_screen
   , const int16_t * HWY_RESTRICT y_point_screen
   , int32_t *delta_pixels
@@ -170,7 +151,8 @@ static int32_t ONE_delta_pixels_int16_fp16(
 	return count_valid_points;
 }
 
-int32_t hwy_calc_delta_pixels_int16_fp16(
+
+int32_t hwy_calc_delta_pixels_int16_fdiv(
 	  const size_t	size
   	, const int16_t* __restrict x_screen
   	, const int16_t* __restrict y_screen
@@ -178,7 +160,7 @@ int32_t hwy_calc_delta_pixels_int16_fp16(
   	, int32_t *delta_pixels )
 {
 	const hn::ScalableTag<int16_t> di;
-	//const hn::ScalableTag<int32_t> di32;
+	const hn::ScalableTag<int32_t> di32;
 	const hn::ScalableTag<float> df;
   	const size_t N = hn::Lanes(di);
 
@@ -186,14 +168,14 @@ int32_t hwy_calc_delta_pixels_int16_fp16(
 	//printf("lanes int16_t: %lu\n", hn::Lanes(di));
 	//#endif
 
-	VCalcSettings vsettings(di,settings);
+	ViCalcSettings vsettings(di,settings);
 
 	int32_t valid_points = 0;
 	*delta_pixels = 0;
 	for (size_t i = 0; i < size; i += N) 
 	{
 		int32_t ONE_delta_px = 0;
-		valid_points += ONE_delta_pixels_int16_fp16(di, df, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
+		valid_points += ONE_delta_pixels_int16_fdiv(di, di32, df, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
 		*delta_pixels += ONE_delta_px;
 	}
 
@@ -204,22 +186,31 @@ int32_t hwy_calc_delta_pixels_int16_fp16(
 	return valid_points;
 }
 
+template <class DI>
+int32_t sum_mod(
+    const DI di
+  ,	const int16_t * HWY_RESTRICT a
+  , const int16_t * HWY_RESTRICT b) 
+{
+	
+	auto result = hn::Mod(
+		  hn::Load(di, a)
+		, hn::Load(di, b) );
+
+	auto sum = hn::ReduceSum(di, result);
+	return sum;
+}
+
+int32_t call_sum_mod(
+      const int16_t* __restrict x_screen
+  	, const int16_t* __restrict y_screen) {
+    const hn::ScalableTag<int16_t> di;
+    return sum_mod(di,x_screen,y_screen);
+}
+
+
 
 } // namespace HWY_NAMESPACE {
-} // namespace deltspx
+//} // namespace deltspx
 
 HWY_AFTER_NAMESPACE();
-
-namespace deltapx {
-
-	int32_t run_hwy_calc_delta_pixels_fp16(
-	  const size_t	size
-  	, const int16_t* __restrict x_screen
-  	, const int16_t* __restrict y_screen
-  	, const CalcSettings& settings
-  	, int32_t *delta_pixels )
-	{
-		return HWY_STATIC_DISPATCH(hwy_calc_delta_pixels_int16_fp16)(size, x_screen, y_screen, settings, delta_pixels );
-	}
-
-}
