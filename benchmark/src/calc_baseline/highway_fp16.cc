@@ -1,6 +1,17 @@
 #include "hwy/highway.h"
 
-//#include "calc_baseline.h"
+#include "calc_baseline.h"
+
+HWY_BEFORE_NAMESPACE();
+
+namespace deltapx {
+// This namespace name is unique per target, which allows code for multiple
+// targets to co-exist in the same translation unit. Required when using dynamic
+// dispatch, otherwise optional.
+
+namespace HWY_NAMESPACE {
+
+namespace hn = hwy::HWY_NAMESPACE;
 
 struct CalcSettings
 {
@@ -54,6 +65,7 @@ struct VCalcSettings
     VI minus_half_refline_distance;
 
 	VCalcSettings(
+	VCalcSettings(
 		const DI di,
 		const CalcSettings& settings)
 	{
@@ -68,21 +80,25 @@ struct VCalcSettings
 	}
 };
 
-template <class DI>
-int32_t sum_mod(
-    const DI di
-  ,	const int16_t * HWY_RESTRICT a
-  , const int16_t * HWY_RESTRICT b) 
-{
-	
-	auto result = hn::Mod(
-		  hn::Load(di, a)
-		, hn::Load(di, b) );
+template <class DI, class VI>
+static VI mod_sub_v3(
+	  const DI di
+    , const VI va
+    , const VI vb
+) {
+    auto negative_mask = hn::IsNegative(va);
+    va = hn::IfThenElse(negative_mask, hn::Neg(va), va);
 
-	auto sum = hn::ReduceSum(di, result);
-	return sum;
+    for (;;) {
+            auto mask = hn::Ge(va,vb);
+            va = hn::MaskedSubOr(va, mask, va, vb);
+            if ( hn::AllFalse(di,mask) ) {
+                break;
+            }
+        }
+
+    return hn::IfThenElse(negative_mask, hn::Neg(va), va);
 }
-
 
 //template <class DI, class DW, class DF>
 template <class DI, class DF>
@@ -143,7 +159,9 @@ static int32_t ONE_delta_pixels_int16_fp16(
 	//
 	// V: {u,i} \ V MaskedModOr(V no, M m, V a, V b): returns a[i] % b[i] or no[i] if m[i] is false.
 	//const auto v_refline_distance = hn::Set(di, settings.refline_distance);
-	auto v_x_one_row = hn::MaskedModOr( hn::Zero(di) , mask_within_range, x_baseline, settings.refline_distance );
+	//auto v_x_one_row = hn::MaskedModOr( hn::Zero(di) , mask_within_range, x_baseline, settings.refline_distance );
+	auto v_x_one_row = mod_sub_v3(di, x_baseline, settings.refline_distance);
+	v_x_one_row = hn::IfThenElse( mask_within_range, v_x_one_row, hn::Zero(di) );
 
 	//
 	// 6. distance_to_nearest_refline_on_baseline
@@ -193,7 +211,7 @@ int32_t hwy_calc_delta_pixels_int16_fp16(
 	for (size_t i = 0; i < size; i += N) 
 	{
 		int32_t ONE_delta_px = 0;
-		valid_points += ONE_delta_pixels_int16_fp16(di, df, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
+		valid_points += ONE_delta_pixels_int16_fdiv(di, df, vsettings, x_screen + i, y_screen + i, &ONE_delta_px);
 		*delta_pixels += ONE_delta_px;
 	}
 
@@ -206,7 +224,7 @@ int32_t hwy_calc_delta_pixels_int16_fp16(
 
 
 } // namespace HWY_NAMESPACE {
-} // namespace deltspx
+} // namespace deltapx
 
 HWY_AFTER_NAMESPACE();
 
