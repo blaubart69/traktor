@@ -20,8 +20,8 @@ void test_hwy_calc_delta_pixels()
         , 1    // row_count
     );
 
-	int32_t x[16] __attribute__ ((aligned (64)));
-	int32_t y[16] __attribute__ ((aligned (64)));
+	int16_t x[16] __attribute__ ((aligned (64)));
+	int16_t y[16] __attribute__ ((aligned (64)));
 
 	for (int i=0; i < 16; i++)
 	{
@@ -32,5 +32,5 @@ void test_hwy_calc_delta_pixels()
 	int32_t delta_pixels;
 	x[0] = INT32_MAX;
 	x[15] = INT32_MIN;
-	int32_t valid_points = deltapx::run_hwy_calc_delta_pixels_int32(16, x, y, calcSettings, &delta_pixels);
+	int32_t valid_points = deltapx::run_hwy_calc_delta_pixels_fdiv(16, x, y, calcSettings, &delta_pixels);
 }

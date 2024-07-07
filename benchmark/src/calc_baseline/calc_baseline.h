@@ -79,28 +79,8 @@ void calc_baseline_full_loop(
 
 namespace deltapx {
 
-	int32_t run_hwy_calc_delta_pixels_int32(
-	  const size_t	size
-  	, const int32_t* __restrict x_screen
-  	, const int32_t* __restrict y_screen
-  	, const CalcSettings& settings
-  	, int32_t *delta_pixels );
 
-    int32_t run_hwy_calc_delta_pixels_int32_only(
-	  const size_t	size
-  	, const int32_t* __restrict x_screen
-  	, const int32_t* __restrict y_screen
-  	, const CalcSettings& settings
-  	, int32_t *delta_pixels );
-
-    int32_t run_hwy_calc_delta_pixels_int16(
-	  const size_t	size
-  	, const int16_t* __restrict x_screen
-  	, const int16_t* __restrict y_screen
-  	, const CalcSettings& settings
-  	, int32_t *delta_pixels );
-
-    int32_t run_hwy_calc_delta_pixels_int16_fdiv(
+    int32_t run_hwy_calc_delta_pixels_fdiv(
 	  const size_t	size
   	, const int16_t* __restrict x_screen
   	, const int16_t* __restrict y_screen
@@ -110,6 +90,13 @@ namespace deltapx {
     void print_target();
 
     int32_t run_hwy_calc_delta_pixels_fp16(
+	  const size_t	size
+  	, const int16_t* __restrict x_screen
+  	, const int16_t* __restrict y_screen
+  	, const CalcSettings& settings
+  	, int32_t *delta_pixels );
+
+    int32_t run_hwy_calc_delta_pixels_fdiv_submod(
 	  const size_t	size
   	, const int16_t* __restrict x_screen
   	, const int16_t* __restrict y_screen

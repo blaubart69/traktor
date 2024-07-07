@@ -338,8 +338,8 @@ int main()
 {
 
     //test_hwy_calc_delta_pixels();
-    play::mike();
-    return 0;
+    //play::mike();
+    //return 0;
 
     size_t frames = 30;
     int rows = 3;
@@ -354,11 +354,12 @@ int main()
         bench_a_baseline<CalcSettingsShort,int16_t> ("baseline short int",    frames, rows, calc_baseline_delta_from_nearest_refline_short_int);
         bench_a_baseline<CalcSettingsFloat,int32_t> ("baseline only float",   frames, rows, calc_baseline_delta_from_nearest_refline_only_float);
         bench_v16                                   ("baseline v16",          frames, rows);
-        bench_highway<int32_t>                      ("highway int32",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int32);
-        bench_highway<int32_t>                      ("highway int32 only",    frames, rows, deltapx::run_hwy_calc_delta_pixels_int32_only);
-        bench_highway<int16_t>                      ("highway int16",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int16);
-        bench_highway<int16_t>                      ("highway int16 fdiv",    frames, rows, deltapx::run_hwy_calc_delta_pixels_int16_fdiv);
-        bench_highway<int16_t>                      ("highway int16 fp16",    frames, rows, deltapx::run_hwy_calc_delta_pixels_fp16);
+        //bench_highway<int16_t>                      ("highway int16",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int16);
+        //bench_highway<int16_t>                      ("highway int16 only",    frames, rows, deltapx::run_hwy_calc_delta_pixels_int16_only);
+        //bench_highway<int16_t>                      ("highway int16",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int16);
+        bench_highway<int16_t>                      ("highway int16 fdiv",    frames, rows, deltapx::run_hwy_calc_delta_pixels_fdiv);
+        bench_highway<int16_t>                      ("highway int16 fdiv submod",    frames, rows, deltapx::run_hwy_calc_delta_pixels_fdiv_submod);
+        //bench_highway<int16_t>                      ("highway int16 fp16",    frames, rows, deltapx::run_hwy_calc_delta_pixels_fp16);
         
         //bench_a_baseline_loop<CalcSettings>("baseline simple loop",  frames, rows, calc_baseline_full_loop);
     }
