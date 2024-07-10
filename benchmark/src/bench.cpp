@@ -7,7 +7,7 @@
 void print_result(const char* impl_name, std::chrono::_V2::system_clock::rep duration_ns,
     size_t points, int64_t delta_pixels_sum, size_t in_range, size_t out_range)
 {
-    printf("%25s\t%6.0f ms\tpoints: %12lu\tdelta_pixels_sum: %10d\tin: %lu\tout: %lu\n", 
+    printf("%25s\t%6.0f ms\tpoints: %12lu\tdelta_pixels_sum: %10ld\tin: %lu\tout: %lu\n", 
         impl_name
         , ( (float)duration_ns / 1000000 )
         , points, delta_pixels_sum, in_range, out_range );

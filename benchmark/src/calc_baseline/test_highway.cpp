@@ -30,7 +30,7 @@ void test_hwy_calc_delta_pixels()
 	}
 
 	int32_t delta_pixels;
-	x[0] = INT32_MAX;
-	x[15] = INT32_MIN;
+	x[0] = INT16_MAX;
+	x[15] = INT16_MIN;
 	int32_t valid_points = deltapx::run_hwy_calc_delta_pixels_fdiv(16, x, y, calcSettings, &delta_pixels);
 }
