@@ -142,8 +142,8 @@ static int32_t ONE_delta_pixels_fdiv(
 	auto mul_even = hn::ConvertTo(df, hn::MulEven( settings.y_baseline , v_x_coord ));
 	auto mul_odd  = hn::ConvertTo(df, hn::MulOdd ( settings.y_baseline , v_x_coord ));
 
-	using VW = hn::Vec<decltype(dw)>;
-	using VI = hn::Vec<decltype(di)>;
+	//using VW = hn::Vec<decltype(dw)>;
+	//using VI = hn::Vec<decltype(di)>;
 
 	auto point_y_even = hn::ConvertTo(df, hn::PromoteEvenTo(dw, v_y_coord ) );
 	auto point_y_odd  = hn::ConvertTo(df, hn::PromoteOddTo (dw, v_y_coord ) );
@@ -151,6 +151,18 @@ static int32_t ONE_delta_pixels_fdiv(
 	auto x_baseline_even = hn::ConvertTo(dw, hn::Div( mul_even, point_y_even ) );
 	auto x_baseline_odd  = hn::ConvertTo(dw, hn::Div( mul_odd,  point_y_odd  ) );
 	
+
+	/* INTEGER DIV
+	auto mul_even = hn::MulEven( settings.y_baseline , v_x_coord );
+	auto mul_odd  = hn::MulOdd ( settings.y_baseline , v_x_coord );
+	
+	auto point_y_even = hn::PromoteEvenTo(dw, v_y_coord );
+	auto point_y_odd  = hn::PromoteOddTo (dw, v_y_coord );
+
+	auto x_baseline_even = hn::Div( mul_even, point_y_even );
+	auto x_baseline_odd  = hn::Div( mul_odd,  point_y_odd  );
+	*/
+
 	//
 	// 3. apply offset
 	//
@@ -168,7 +180,7 @@ static int32_t ONE_delta_pixels_fdiv(
 
 	const hn::Half< hn::RepartitionToNarrow<DW> > dwh;
 
-	VI v_x_baseline = 
+	auto v_x_baseline = 
 		hn::Combine(di, 
 			hn::DemoteTo(dwh, x_baseline_even)
 		  , hn::DemoteTo(dwh, x_baseline_odd) );
