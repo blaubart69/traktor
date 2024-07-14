@@ -1,27 +1,6 @@
 #include <cmath>
-#include <cstddef>
 
-struct CalcSettings
-{
-    const int x_half;
-    const int rowPerspectivePx;
-    const int y_baseline;
-    const int offset;
-    const unsigned int refline_distance;
-    const unsigned int half_refline_distance;
-    const unsigned int range_baseline;
-
-    CalcSettings(int x_half, int y_screen_size, int rowPerspectivePx, int refline_distance, int offset, int row_count) 
-    :   x_half(x_half)
-    ,   rowPerspectivePx(rowPerspectivePx)
-    ,   y_baseline(rowPerspectivePx + y_screen_size)
-    ,   offset(offset)
-    ,   refline_distance(refline_distance)
-    ,   half_refline_distance(refline_distance / 2)
-    ,   range_baseline( ( refline_distance * row_count ) + (refline_distance / 2) )
-    {}
-};
-
+#include "calc.h"
 
 #define PRIVATE static
 
@@ -48,13 +27,13 @@ PRIVATE CoordPoint project_screen_point_to_coord(const int x_point_screen, const
 //
 PRIVATE bool project_x_onto_baseline(const CoordPoint point, const int y_baseline, int *x_base_line) 
 {
-    if ( point.x == 0 ) 
+    /*if ( point.x == 0 ) 
     {
         // point is on the middle line
         // projected to the baseline: x = 0
         *x_base_line = 0;
     }
-    else if ( point.y == 0) 
+    else */if ( point.y == 0) 
     {
         // point is on the same y as the Fluchtpunkt
         // projecting to the baseline is not possible.
@@ -66,8 +45,7 @@ PRIVATE bool project_x_onto_baseline(const CoordPoint point, const int y_baselin
     }
     else
     {
-        const float steigung = (float)point.y / (float)point.x;
-        *x_base_line = (int) ( (float)y_baseline / steigung );
+        *x_base_line = (int )( (float)y_baseline * (float)point.x ) / (float)point.y;
     }
 
     return true;
@@ -106,7 +84,7 @@ PRIVATE int distance_to_nearest_refline_on_baseline(const int x_first_row, const
     return x_first_row;
 }
 
-bool calc_simple(const int x_screen, const int y_screen, const CalcSettings& settings, int *delta_pixels) 
+bool calc_v2_float_mul(const int16_t x_screen, const int16_t y_screen, const CalcSettings& settings, int *delta_pixels)
 {
     CoordPoint p;
     p = project_screen_point_to_coord(x_screen,y_screen, settings.x_half, settings.rowPerspectivePx);

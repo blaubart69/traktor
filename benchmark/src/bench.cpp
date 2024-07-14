@@ -353,7 +353,7 @@ int main()
         bench_a_baseline<CalcSettings,int32_t>      ("baseline float mul",    frames, rows, calc_baseline_delta_from_nearest_refline_float_mul);
         bench_a_baseline<CalcSettingsShort,int16_t> ("baseline short int",    frames, rows, calc_baseline_delta_from_nearest_refline_short_int);
         bench_a_baseline<CalcSettingsFloat,int32_t> ("baseline only float",   frames, rows, calc_baseline_delta_from_nearest_refline_only_float);
-        bench_v16                                   ("baseline v16",          frames, rows);
+        //bench_v16                                   ("baseline v16",          frames, rows);
         //bench_highway<int16_t>                      ("highway int16",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int16);
         //bench_highway<int16_t>                      ("highway int16 only",    frames, rows, deltapx::run_hwy_calc_delta_pixels_int16_only);
         //bench_highway<int16_t>                      ("highway int16",         frames, rows, deltapx::run_hwy_calc_delta_pixels_int16);
