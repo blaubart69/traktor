@@ -20,21 +20,21 @@ static void bm_v1_simple(benchmark::State& state) {
   // Perform setup here
   for (auto _ : state) {
     // This code gets timed
-    run_a_calc(30,3,calc_v1_simple);
+    run_a_calc(30,5,calc_v1_simple);
   }
 }
 static void bm_v2_float_mul(benchmark::State& state) {
   // Perform setup here
   for (auto _ : state) {
     // This code gets timed
-    run_a_calc(30,3,calc_v2_float_mul);
+    run_a_calc(30,5,calc_v2_float_mul);
   }
 }
 static void bm_v3_short_int(benchmark::State& state) {
   // Perform setup here
   for (auto _ : state) {
     // This code gets timed
-    run_a_calc(30,3,calc_v3_short_int);
+    run_a_calc(30,5,calc_v3_short_int);
   }
 }
 // Register the function as a benchmark
