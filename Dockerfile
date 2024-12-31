@@ -1,14 +1,28 @@
-FROM alpine:3.19 as build
+ARG ALPINE_VERSION=3.19
 
-RUN  apk update         \
-  && apk upgrade        \
-  && apk add --no-cache \
+# ARG OPENCV_VERSION=4.10.0
+# 2024-12-31 Spindler
+#   Alpine is using a fixed version of OpenCV for each of it's versions
+#   so it doesn't make sense to specify a OpenCV version.
+#   It's backed into the Alpine version
+
+FROM alpine:${ALPINE_VERSION} AS build
+
+#ARG OPENCV_VERSION
+
+# opencv-dev in a seperate RUN step, because it pulls in >600 packages
+RUN apk add --no-cache  \
+    opencv-dev
+    #opencv-dev~=${OPENCV_VERSION}
+
+    # apk update         \
+#  && apk upgrade        \
+RUN apk add --no-cache  \
     wget                \
     clang               \
     alpine-sdk          \
     cmake               \
-    libgpiod-dev        \
-    opencv-dev~=4.8.1
+    libgpiod-dev    
 
 RUN     mkdir -p    /traktor/deps/cpp-httplib   \
                     /traktor/deps/json          \
@@ -25,12 +39,13 @@ RUN     cmake -DCMAKE_BUILD_TYPE=Release .. \
 #
 # MAIN image
 #
-from alpine:3.19
+FROM alpine:${ALPINE_VERSION}
 
-RUN  apk update         \
-  && apk add --no-cache \
+ARG OPENCV_VERSION
+
+RUN apk add --no-cache  \
     libgpiod            \
-    opencv~=4.8.1
+    opencv
 
 #
 # 2024-01-16 Spindler
