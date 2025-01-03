@@ -8,7 +8,7 @@
           </q-icon>
         </q-item-section>
         <q-item-section>
-          <q-range v-model="model" label-always :min="0" :max="179" />
+          <q-range v-model="hue" label-always :min="0" :max="179" />
         </q-item-section>
       </q-item>
       <q-separator spaced />
@@ -19,7 +19,7 @@
           </q-icon>
         </q-item-section>
         <q-item-section>
-          <q-range v-model="model" label-always :min="0" :max="179" />
+          <q-range v-model="satturation" label-always :min="0" :max="255" />
         </q-item-section>
       </q-item>
       <q-item>
@@ -29,7 +29,7 @@
           </q-icon>
         </q-item-section>
         <q-item-section>
-          <q-range v-model="model" label-always :min="0" :max="179" />
+          <q-range v-model="brightness" label-always :min="0" :max="255" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -40,8 +40,16 @@
 import { ref } from 'vue'
 // import type { HarrowSettings } from './models'
 
-const model = ref({
+const hue = ref({
   min: 36,
   max: 80,
+})
+const satturation = ref({
+  min: 0,
+  max: 180,
+})
+const brightness = ref({
+  min: 0,
+  max: 180,
 })
 </script>

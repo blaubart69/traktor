@@ -1,6 +1,6 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <div><img src="/video" /></div>
+    <img style="width: 100%; display: block" src="http://localhost:9080/video" />
   </q-page>
 </template>
 
