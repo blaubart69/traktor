@@ -42,42 +42,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { HarrowSettings } from './models'
-import { onMounted } from 'vue'
-import { useSettingsStore } from '../stores/settings-store'
+import { ref } from 'vue';
+import type { HarrowSettings } from './models';
+import { onMounted } from 'vue';
+import { useSettingsStore } from '../stores/settings-store';
 
-const store = useSettingsStore()
+const store = useSettingsStore();
 
 const hue = ref({
   min: 36,
   max: 80,
-})
+});
 const satturation = ref({
   min: 0,
   max: 180,
-})
+});
 const brightness = ref({
   min: 0,
   max: 180,
-})
+});
 
 onMounted(async () => {
-  await store.list()
-})
+  await store.list();
+});
 
-const erode = ref(3)
-const dilate = ref(3)
-const area = ref(130)
+const erode = ref(3);
+const dilate = ref(3);
+const area = ref(130);
 
-const maxRows = ref(3)
-const rowRangePx = ref(160)
-const rowPerspectivePx = ref(200)
-const rowSpacingPx = ref(5)
-const rowThresholdPx = ref(5)
+const maxRows = ref(3);
+const rowRangePx = ref(160);
+const rowPerspectivePx = ref(200);
+const rowSpacingPx = ref(5);
+const rowThresholdPx = ref(5);
 
 const applyChanges = () => {
-  const data = {} as HarrowSettings
+  const data = {} as HarrowSettings;
 
   /*
   data.colorFrom[0] = hue.value.min
@@ -88,17 +88,17 @@ const applyChanges = () => {
   data.colorTo[2] = brightness.value.max
   */
 
-  data.dilate = dilate.value
-  data.erode = erode.value
-  data.minimalContourArea = area.value
+  data.dilate = dilate.value;
+  data.erode = erode.value;
+  data.minimalContourArea = area.value;
 
-  data.maxRows = maxRows.value
-  data.rowRangePx = rowRangePx.value
-  data.rowPerspectivePx = rowPerspectivePx.value
-  data.rowSpacingPx = rowSpacingPx.value
-  data.rowThresholdPx = rowThresholdPx.value
+  data.maxRows = maxRows.value;
+  data.rowRangePx = rowRangePx.value;
+  data.rowPerspectivePx = rowPerspectivePx.value;
+  data.rowSpacingPx = rowSpacingPx.value;
+  data.rowThresholdPx = rowThresholdPx.value;
 
-  console.log(data)
-  store.save('lastSettings.json', data)
-}
+  console.log(data);
+  store.save('lastSettings.json', data);
+};
 </script>

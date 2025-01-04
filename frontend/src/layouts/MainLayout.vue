@@ -23,12 +23,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import SettingsComponent from 'components/SettingsComponent.vue'
+import { ref } from 'vue';
+import SettingsComponent from 'components/SettingsComponent.vue';
 
-const leftDrawerOpen = ref(false)
+const leftDrawerOpen = ref(false);
 
 function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+  leftDrawerOpen.value = !leftDrawerOpen.value;
 }
 </script>
