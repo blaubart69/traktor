@@ -11,11 +11,12 @@ So the journey begins. I was very sceptical and thought we had not the slightest
 We didn't even know where to start.
 
 2021 - Spring
+
 But my friend doesn't give up and hacked some prototype in Python using OpenCV.
 We did a test out in the fields using a broomstick which we centered over one row of plants. Using a Raspi4 and a shitty webcam.
 The software should center the stick above the plants as the tractor moves left or right.
 To my absolute astonishment it works not that bad!!
-I catched fire! Thank to my friend not giving up in the first place! :-)
+I catched fire! Thanks to my friend not giving up in the first place! :-)
 
 2021 - Summer
 
