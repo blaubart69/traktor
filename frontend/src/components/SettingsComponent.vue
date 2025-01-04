@@ -33,12 +33,21 @@
         </q-item-section>
       </q-item>
     </q-list>
+    <q-item>
+      <q-item-section side>
+        <q-btn @click="applyChanges"><q-icon name="done" /></q-btn>
+      </q-item-section>
+    </q-item>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-// import type { HarrowSettings } from './models'
+import type { HarrowSettings } from './models'
+import { onMounted } from 'vue'
+import { useSettingsStore } from '../stores/settings-store'
+
+const store = useSettingsStore()
 
 const hue = ref({
   min: 36,
@@ -52,4 +61,44 @@ const brightness = ref({
   min: 0,
   max: 180,
 })
+
+onMounted(async () => {
+  await store.list()
+})
+
+const erode = ref(3)
+const dilate = ref(3)
+const area = ref(130)
+
+const maxRows = ref(3)
+const rowRangePx = ref(160)
+const rowPerspectivePx = ref(200)
+const rowSpacingPx = ref(5)
+const rowThresholdPx = ref(5)
+
+const applyChanges = () => {
+  const data = {} as HarrowSettings
+
+  /*
+  data.colorFrom[0] = hue.value.min
+  data.colorTo[0] = hue.value.max
+  data.colorFrom[1] = satturation.value.min
+  data.colorTo[1] = satturation.value.max
+  data.colorFrom[2] = brightness.value.min
+  data.colorTo[2] = brightness.value.max
+  */
+
+  data.dilate = dilate.value
+  data.erode = erode.value
+  data.minimalContourArea = area.value
+
+  data.maxRows = maxRows.value
+  data.rowRangePx = rowRangePx.value
+  data.rowPerspectivePx = rowPerspectivePx.value
+  data.rowSpacingPx = rowSpacingPx.value
+  data.rowThresholdPx = rowThresholdPx.value
+
+  console.log(data)
+  store.save('lastSettings.json', data)
+}
 </script>
