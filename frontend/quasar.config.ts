@@ -2,6 +2,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
+import { IncomingMessage, ServerResponse } from 'http';
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -80,7 +81,23 @@ export default defineConfig((/* ctx */) => {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {
       // https: true,
-      open: true, // opens browser window automatically
+      open: true, // opens browser window automaticallyIncomingMessage
+      proxy: {
+        // proxy all requests starting with /api to jsonplaceholder
+        '/api': {
+          target: 'http://localhost:9080',
+          //changeOrigin: true,
+          /*bypass: (req, res, proxyOptions) => {
+              console.log('proxy: ');
+              return null;
+          }*/
+         // 2025-01-05 Spindla
+         //   "rewrite" throws an error when invoked/use
+         //   so I changed all the backend endpoints.
+         //   prefixed them with "/api"
+         //rewrite: (path) => { path.replace(/^\/api/, '') }
+        }
+      }
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework

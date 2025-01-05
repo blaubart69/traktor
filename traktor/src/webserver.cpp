@@ -26,7 +26,7 @@ WORKER_RC encode_main(Workitem* work, EncodeContext* ctx);
 
 void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, Stats* stats)
 {
-    svr->Get("/video", [=](__attribute__((unused)) const Request &req, Response &res) {
+    svr->Get("/api/video", [=](__attribute__((unused)) const Request &req, Response &res) {
 
         static const std::string boundary("--Ba4oTvQMY8ew04N8dcnM\r\nContent-Type: image/jpeg\r\n\r\n");
         static const std::string CRLF("\r\n");
@@ -74,7 +74,7 @@ void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, St
 
                 pipeline->run_encode_3( encode_main, &ctx );
                 thread_count_before_add = thread_count_video.fetch_add(-1);
-                printf("I: webserver: URL /video... leaving. thread_count was %d before decrementing by 1\n", thread_count_before_add);
+                printf("I: webserver: URL /api/video... leaving. thread_count was %d before decrementing by 1\n", thread_count_before_add);
 
                 return false; // return 'false' if you want to cancel the process.
             },
@@ -86,7 +86,7 @@ void URL_video(httplib::Server* svr, Shared* shared, ImagePipeline* pipeline, St
 
 void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
 {
-    svr->Post("/offset/delta", [=](const Request &req, Response &res)
+    svr->Post("/api/offset/delta", [=](const Request &req, Response &res)
     {
         try
         {
@@ -96,7 +96,7 @@ void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
             const int offset_delta = data.value<int>("offset", 0);
             detect_settings->add_offset_delta(offset_delta);
 
-            printf("I: offset/set: was: %d. delta: %d. now: %d\n"
+            printf("I: /api/offset/set: was: %d. delta: %d. now: %d\n"
                 , offset_before
                 , offset_delta
                 , detect_settings->getReflineSettings().offset);
@@ -104,12 +104,12 @@ void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
         }
         catch(const std::exception& e)
         {
-            fprintf(stderr, "/offset/delta: %s\n", e.what());
+            fprintf(stderr, "/api/offset/delta: %s\n", e.what());
             res.status = 500;
             res.set_content(e.what(), "text/plain");
         }
     });
-    svr->Post("/offset/set", [=](const Request &req, Response &res)
+    svr->Post("/api/offset/set", [=](const Request &req, Response &res)
     {
         try
         {
@@ -126,12 +126,12 @@ void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
         }
         catch(const std::exception& e)
         {
-            fprintf(stderr, "/offset/set: %s\n", e.what());
+            fprintf(stderr, "/api/offset/set: %s\n", e.what());
             res.status = 500;
             res.set_content(e.what(), "text/plain");
         }
     });
-    svr->Post("/offset/setzero", [=](__attribute__((unused)) const Request &req, Response &res)
+    svr->Post("/api/offset/setzero", [=](__attribute__((unused)) const Request &req, Response &res)
     {
         try
         {
@@ -141,7 +141,7 @@ void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
         }
         catch(const std::exception& e)
         {
-            fprintf(stderr, "/offset: %s\n", e.what());
+            fprintf(stderr, "/api/offset/setzero: %s\n", e.what());
             res.status = 500;
             res.set_content(e.what(), "text/plain");
         }
@@ -150,7 +150,7 @@ void URL_offset(httplib::Server* svr, DetectSettings* detect_settings)
 
 void URL_applyChanges(httplib::Server* svr, DetectSettings* detect_settings)
 {
-    svr->Post("/applyChanges", [=](const Request &req, Response &res)
+    svr->Post("/api/applyChanges", [=](const Request &req, Response &res)
     {
         try
         {
@@ -165,7 +165,7 @@ void URL_applyChanges(httplib::Server* svr, DetectSettings* detect_settings)
         }
         catch(const std::exception& e)
         {
-            fprintf(stderr, "/applyChanges: %s\n", e.what());
+            fprintf(stderr, "/api/applyChanges: %s\n", e.what());
             res.status = 500;
             res.set_content(e.what(), "text/plain");
         }
@@ -174,7 +174,7 @@ void URL_applyChanges(httplib::Server* svr, DetectSettings* detect_settings)
 
 void URL_current(httplib::Server* svr, DetectSettings* settings)
 {
-    svr->Get("/current", [=](__attribute__((unused)) const Request &req, Response &res) {
+    svr->Get("/api/current", [=](__attribute__((unused)) const Request &req, Response &res) {
 
         nlohmann::json data;
         {
@@ -200,7 +200,7 @@ void URL_current(httplib::Server* svr, DetectSettings* settings)
 
 void URL_stats(httplib::Server* svr, const Counter* diff, const ImageSettings* imageSettings)
 {
-    svr->Get("/stats", [=](__attribute__((unused)) const Request &req, Response &res) {
+    svr->Get("/api/stats", [=](__attribute__((unused)) const Request &req, Response &res) {
 
         using namespace std::chrono;
 
@@ -267,7 +267,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, Stats* s
     //
     // ------------------------------------------------------------------------
     //
-    svr.Get("/list",       [&](__attribute__((unused)) const Request &req, Response &res) {
+    svr.Get("/api/list",       [&](__attribute__((unused)) const Request &req, Response &res) {
         errno = 0;
         DIR* dp = opendir("./detect");
         if (dp != NULL) {
@@ -297,7 +297,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, Stats* s
     //
     // ------------------------------------------------------------------------
     //
-    svr.Get("/load/(.+)",  [&](const Request &req, Response &res) {
+    svr.Get("/api/load/(.+)",  [&](const Request &req, Response &res) {
         std::string filename_to_load("./detect/");
         filename_to_load.append(req.matches[1].str());
 
@@ -314,7 +314,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, Stats* s
     //
     // ------------------------------------------------------------------------
     //
-    svr.Post("/save/(.+)", [&](const Request &req, Response &res) {
+    svr.Post("/api/save/(.+)", [&](const Request &req, Response &res) {
         std::string filename_to_save("./detect/");
         filename_to_save.append(req.matches[1].str());
 
@@ -329,7 +329,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, Stats* s
     //
     // ------------------------------------------------------------------------
     //
-    svr.Get("/debug/lift",  [&](__attribute__((unused)) const Request &req, Response &res) {
+    svr.Get("/api/debug/lift",  [&](__attribute__((unused)) const Request &req, Response &res) {
         shared->harrowLifted.store(true);
         printf("D: %s - shared->harrowLifted.store(true)\n", req.path.c_str());
         res.status = 200;
@@ -337,7 +337,7 @@ int thread_webserver(int port, Shared* shared, ImagePipeline* pipeline, Stats* s
     //
     // ------------------------------------------------------------------------
     //
-    svr.Get("/debug/unlift", [&](__attribute__((unused)) const Request &req, Response &res) {
+    svr.Get("/api/debug/unlift", [&](__attribute__((unused)) const Request &req, Response &res) {
         shared->harrowLifted.store(false);
         printf("D: %s - shared->harrowLifted.store(false)\n", req.path.c_str());
         res.status = 200;

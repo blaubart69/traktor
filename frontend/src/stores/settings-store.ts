@@ -18,17 +18,17 @@ export const useSettingsStore = defineStore('SettingsStore', {
   actions: {
     async list() {
       // api.get('/list');
-      const { data } = await api.get('/list');
+      const { data } = await api.get('list');
       console.log('list', data);
       // this.records = data as HarrowSettings[];
       return data;
     },
     async load(path: string) {
-      const { data } = await api.get(`/load/${path}`);
+      const { data } = await api.get(`load/${path}`);
       return data;
     },
     async save(path: string, settings: HarrowSettings) {
-      const { data } = await api.post(`/save/${path}`, settings);
+      const { data } = await api.post(`save/${path}`, settings);
       return data;
     },
   },
