@@ -27,12 +27,46 @@
         </q-btn>
       </q-item-section>
       <q-item-section side>
+        <q-btn @click="detect" dense>
+          <q-icon v-if="detecting" name="power" />
+          <q-icon v-if="!detecting" name="power_off" />
+        </q-btn>
+      </q-item-section>
+      <q-item-section side>
         <q-btn @click="disableFields" dense>
           <q-icon v-if="locked" name="lock_outline" />
           <q-icon v-if="!locked" name="lock_open" />
         </q-btn>
       </q-item-section>
     </q-item>
+    <q-list bordered dense>
+      <q-item>
+        <q-item-section side>
+          <q-icon name="multiple_stop">
+            <q-tooltip>Offset</q-tooltip>
+          </q-icon>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn @click="offsetLeft" dense :disable="locked">
+            <q-icon name="arrow_left" />
+          </q-btn>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn @click="offsetZero" dense :disable="locked">
+            <q-icon name="exposure_zero" />
+          </q-btn>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn @click="offsetRight" dense :disable="locked">
+            <q-icon name="arrow_right" />
+          </q-btn>
+        </q-item-section>
+        <q-item-section side>
+          <q-input :disable="true" v-model="vm.offset" borderless />
+        </q-item-section>
+      </q-item>
+    </q-list>
+
     <q-list bordered dense>
       <q-item>
         <q-item-section side>
@@ -267,6 +301,7 @@ const store = useSettingsStore();
 const { profiles } = storeToRefs(store);
 const vm = ref({} as SettingsViewModel);
 const locked = ref(false);
+const detecting = ref(false);
 const save = ref(false);
 const profileName = ref('');
 
@@ -310,6 +345,26 @@ const resetSettings = async () => {
   fromBackend(data);
 };
 
+const detect = async () => {
+  detecting.value = !detecting.value;
+  await applyChanges();
+};
+
+const offsetLeft = async () => {
+  vm.value.offset = vm.value.offset - 1;
+  await applyChanges();
+};
+
+const offsetRight = async () => {
+  vm.value.offset = vm.value.offset + 1;
+  await applyChanges();
+};
+
+const offsetZero = async () => {
+  vm.value.offset = 0;
+  await applyChanges();
+};
+
 const toBackend = () => {
   const data = {
     colorFrom: [
@@ -331,8 +386,9 @@ const toBackend = () => {
     rowPerspectivePx: vm.value.rowPerspective,
     rowSpacingPx: vm.value.rowSpacing,
     rowThresholdPx: vm.value.rowThreshold,
+
+    offsetPx: vm.value.offset,
   } as HarrowSettings;
-  // TODO offset is missing
   return data;
 };
 

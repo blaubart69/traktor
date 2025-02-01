@@ -46,5 +46,13 @@ export const useSettingsStore = defineStore('SettingsStore', {
       const { data } = await api.post('/applyChanges', settings);
       return data;
     },
+    async offsetDelta(delta: number) {
+      const { data } = await api.post('/offset/delta', delta);
+      return data;
+    },
+    async offsetZero() {
+      const { data } = await api.post('/offset/setzero');
+      return data;
+    },
   },
 });
