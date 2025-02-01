@@ -2,7 +2,6 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
-import { IncomingMessage, ServerResponse } from 'http';
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -91,13 +90,13 @@ export default defineConfig((/* ctx */) => {
               console.log('proxy: ');
               return null;
           }*/
-         // 2025-01-05 Spindla
-         //   "rewrite" throws an error when invoked/use
-         //   so I changed all the backend endpoints.
-         //   prefixed them with "/api"
-         //rewrite: (path) => { path.replace(/^\/api/, '') }
-        }
-      }
+          // 2025-01-05 Spindla
+          //   "rewrite" throws an error when invoked/use
+          //   so I changed all the backend endpoints.
+          //   prefixed them with "/api"
+          //rewrite: (path) => { path.replace(/^\/api/, '') }
+        },
+      },
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
