@@ -6,18 +6,20 @@
           v-model="profileName"
           label="Profil"
           :options="profiles"
-          use-input
-          hide-selected
-          fill-input
-          input-debounce="0"
           dense
           filled
+          style="width: 250px"
           @update:model-value="loadSettings"
         >
           <template v-slot:prepend>
             <q-icon name="file_open" />
           </template>
         </q-select>
+      </q-item-section>
+      <q-item-section side>
+        <q-btn @click="resetSettings" dense>
+          <q-icon name="restart_alt" />
+        </q-btn>
       </q-item-section>
       <q-item-section side>
         <q-btn @click="save = true" dense>
@@ -300,6 +302,11 @@ const saveSettings = async () => {
 
 const loadSettings = async (profile: string) => {
   const data = await store.load(profile);
+  fromBackend(data);
+};
+
+const resetSettings = async () => {
+  const data = await store.load(profileName.value);
   fromBackend(data);
 };
 
