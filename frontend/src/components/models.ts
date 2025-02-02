@@ -13,6 +13,8 @@ export interface HarrowSettings {
   rowRangePx: number;
 
   offsetPx: number;
+
+  detecting: boolean;
 }
 
 export interface MinMaxModel {
@@ -36,4 +38,6 @@ export interface SettingsViewModel {
   rowRange: number;
 
   offset: number;
+
+  detecting: boolean;
 }

@@ -28,8 +28,8 @@
       </q-item-section>
       <q-item-section side>
         <q-btn @click="detect" dense>
-          <q-icon v-if="detecting" name="power" />
-          <q-icon v-if="!detecting" name="power_off" />
+          <q-icon v-if="vm.detecting" name="power" />
+          <q-icon v-if="!vm.detecting" name="power_off" />
         </q-btn>
       </q-item-section>
       <q-item-section side>
@@ -301,7 +301,6 @@ const store = useSettingsStore();
 const { profiles } = storeToRefs(store);
 const vm = ref({} as SettingsViewModel);
 const locked = ref(false);
-const detecting = ref(false);
 const save = ref(false);
 const profileName = ref('');
 
@@ -346,7 +345,7 @@ const resetSettings = async () => {
 };
 
 const detect = async () => {
-  detecting.value = !detecting.value;
+  vm.value.detecting = !vm.value.detecting;
   await applyChanges();
 };
 
@@ -388,6 +387,8 @@ const toBackend = () => {
     rowThresholdPx: vm.value.rowThreshold,
 
     offsetPx: vm.value.offset,
+
+    detecting: vm.value.detecting,
   } as HarrowSettings;
   return data;
 };
@@ -418,6 +419,8 @@ const fromBackend = (data: HarrowSettings) => {
     rowThreshold: data.rowThresholdPx,
 
     offset: data.offsetPx,
+
+    detecting: data.detecting,
   };
 };
 </script>
