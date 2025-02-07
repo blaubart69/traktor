@@ -1,3 +1,17 @@
+FROM node:22-bookworm 
+
+WORKDIR /traktor/build/frontend
+
+COPY ./frontend/src/**              /traktor/build/frontend/src/
+COPY ./frontend/public              /traktor/build/frontend/
+COPY ./frontend/index.html          /traktor/build/frontend/
+COPY ./frontend/package.json        /traktor/build/frontend/
+COPY ./frontend/quasar.config.ts    /traktor/build/frontend/
+COPY ./frontend/tsconfig.json       /traktor/build/frontend/
+COPY ./frontend/postcss.config.js   /traktor/build/frontend/
+
+RUN yarn build
+
 ARG ALPINE_VERSION=3.19
 
 # ARG OPENCV_VERSION=4.10.0
@@ -56,7 +70,7 @@ COPY --from=build   /usr/lib/libopencv_aruco.so.4.8.1 /usr/lib/libopencv_aruco.s
 RUN ln -s           /usr/lib/libopencv_aruco.so.4.8.1 /usr/lib/libopencv_aruco.so.408
 
 COPY --from=build   /traktor/build/traktor  /app/
-COPY                ./static                /app/static/
+COPY                /traktor/build/frontend/dist/spa/    /app/static/
 
 WORKDIR /app
 EXPOSE 9080

@@ -165,7 +165,8 @@ void detect_main(Workitem* work, DetectContext* ctx)
         work->detect_result.is_in_threshold = std::abs(work->detect_result.avg_delta_px) <= refline_settings.rowThresholdPx;
         
         if (    (ctx->harrow != nullptr)                         
-            &&  (ctx->shared->harrowLifted.load() == false) )
+            &&  (ctx->shared->harrowLifted.load() == false) 
+            &&  (ctx->shared->detectSettings.isDetecting() == true))
         {
             HARROW_DIRECTION direction = get_harrow_direction(work->detect_result.is_in_threshold, work->detect_result.avg_delta_px);
             ctx->harrow->move(direction, "detect");

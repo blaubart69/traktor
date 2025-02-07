@@ -98,6 +98,7 @@ struct DetectSettings {
     private:
         ImageSettings       imageSettings;
         ReflinesSettings    reflineSettings;
+        bool                detecting;
 
         void recalculate_rowCount()
         {
@@ -122,6 +123,15 @@ struct DetectSettings {
         
 
         DetectSettings() {
+            detecting = false;
+        }
+
+        bool isDetecting() { 
+            return this->detecting; 
+        }
+
+        void set_detecting(const bool detecting) {
+            this->detecting = detecting;
         }
 
         void add_offset_delta(const int delta) {

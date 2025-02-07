@@ -26,4 +26,6 @@ void DetectSettings::set_fromJson(const std::string& jsonString)
 
     this->set_rowRangePx        ( data.value<int>("rowRangePx", 0) ) ;
     this->set_offset            ( data.value<int>("offsetPx",   0) ) ;
+
+    this->set_detecting         ( data.value<bool>("detecting", false) ) ;
 }
