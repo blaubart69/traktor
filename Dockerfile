@@ -44,7 +44,7 @@ COPY ./traktor/CMakeLists.txt   /traktor/CMakeLists.txt
 
 WORKDIR /traktor/build
 RUN     cmake -DCMAKE_BUILD_TYPE=Release .. \
-    &&  make -j`nproc`                      \
+    &&  make -j1	                    \
     &&  strip --strip-all ./traktor
 #
 # MAIN image
